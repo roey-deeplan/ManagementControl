@@ -1,0 +1,18 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/spfx-build/config.2.0.schema.json",
+  "version": "2.0",
+  "bundles": {
+    "management-control-web-part": {
+      "components": [
+        {
+          "entrypoint": "./lib/webparts/managementControl/ManagementControlWebPart.js",
+          "manifest": "./src/webparts/managementControl/ManagementControlWebPart.manifest.json"
+        }
+      ]
+    }
+  },
+  "externals": {},
+  "localizedResources": {
+    "ManagementControlWebPartStrings": "lib/webparts/managementControl/loc/{locale}.js"
+  }
+}
