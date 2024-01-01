@@ -1,7 +1,7 @@
 # management-control
 
+node version - ![version](https://img.shields.io/badge/version-18.17.1-green.svg) 
 ## Summary
-
 Short summary on functionality and used technologies.
 
 [picture of the solution in action, if possible]
