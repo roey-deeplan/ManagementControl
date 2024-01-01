@@ -19,7 +19,8 @@
     "description": { "default": "ManagementControl description" },
     "officeFabricIconFontName": "TaskManager",
     "properties": {
-      "description": "ManagementControl"
+      "Title": "Management Control",
+      "ProductsListId": "cc70ca4f-ee0a-4ea8-a921-f13428228919"
     }
   }]
 }

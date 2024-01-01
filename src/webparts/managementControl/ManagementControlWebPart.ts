@@ -11,25 +11,26 @@ import { IReadonlyTheme } from '@microsoft/sp-component-base';
 import * as strings from 'ManagementControlWebPartStrings';
 import ManagementControl from './components/ManagementControl';
 import { IManagementControlProps } from './components/IManagementControlProps';
+import {
+  PropertyFieldListPicker,
+  PropertyFieldListPickerOrderBy,
+} from "@pnp/spfx-property-controls/lib/PropertyFieldListPicker";
+
+const { solution } = require("../../../config/package-solution.json");
 
 export interface IManagementControlWebPartProps {
-  description: string;
+  Title: string;
+  ProductsListId: string;
 }
 
 export default class ManagementControlWebPart extends BaseClientSideWebPart<IManagementControlWebPartProps> {
-
-  private _isDarkTheme: boolean = false;
-  private _environmentMessage: string = '';
 
   public render(): void {
     const element: React.ReactElement<IManagementControlProps> = React.createElement(
       ManagementControl,
       {
-        description: this.properties.description,
-        isDarkTheme: this._isDarkTheme,
-        environmentMessage: this._environmentMessage,
-        hasTeamsContext: !!this.context.sdks.microsoftTeams,
-        userDisplayName: this.context.pageContext.user.displayName
+        Title: this.properties.Title,
+        ProductsListId: this.properties.ProductsListId
       }
     );
 
@@ -38,7 +39,6 @@ export default class ManagementControlWebPart extends BaseClientSideWebPart<IMan
 
   protected onInit(): Promise<void> {
     return this._getEnvironmentMessage().then(message => {
-      this._environmentMessage = message;
     });
   }
 
@@ -76,7 +76,6 @@ export default class ManagementControlWebPart extends BaseClientSideWebPart<IMan
       return;
     }
 
-    this._isDarkTheme = !!currentTheme.isInverted;
     const {
       semanticColors
     } = currentTheme;
@@ -94,23 +93,31 @@ export default class ManagementControlWebPart extends BaseClientSideWebPart<IMan
   }
 
   protected get dataVersion(): Version {
-    return Version.parse('1.0');
+    return Version.parse(solution.version);
   }
 
   protected getPropertyPaneConfiguration(): IPropertyPaneConfiguration {
     return {
       pages: [
         {
-          header: {
-            description: strings.PropertyPaneDescription
-          },
           groups: [
             {
-              groupName: strings.BasicGroupName,
               groupFields: [
-                PropertyPaneTextField('description', {
-                  label: strings.DescriptionFieldLabel
-                })
+                PropertyPaneTextField("Title", {
+                  label: "Title",
+                }),
+                PropertyFieldListPicker("ProductsListId", {
+                  label: "Select Products list",
+                  selectedList: this.properties.ProductsListId,
+                  includeHidden: false,
+                  orderBy: PropertyFieldListPickerOrderBy.Title,
+                  disabled: false,
+                  onPropertyChange: this.onPropertyPaneFieldChanged.bind(this),
+                  properties: this.properties,
+                  context: this.context as any,
+                  deferredValidationTime: 0,
+                  key: "listPickerFieldId",
+                }),
               ]
             }
           ]
