@@ -16,6 +16,8 @@
     "serve": "fast-serve"
   },
   "dependencies": {
+    "@emotion/react": "^11.11.3",
+    "@emotion/styled": "^11.11.0",
     "@fluentui/react": "^8.106.4",
     "@microsoft/sp-component-base": "1.18.2",
     "@microsoft/sp-core-library": "1.18.2",
@@ -23,11 +25,13 @@
     "@microsoft/sp-office-ui-fabric-core": "1.18.2",
     "@microsoft/sp-property-pane": "1.18.2",
     "@microsoft/sp-webpart-base": "1.18.2",
+    "@mui/icons-material": "^5.15.2",
     "@pnp/sp": "^3.21.0",
     "@pnp/spfx-property-controls": "^3.15.1",
     "react": "17.0.1",
     "react-dom": "17.0.1",
-    "tslib": "2.3.1"
+    "tslib": "2.3.1",
+    "uuid": "^9.0.1"
   },
   "devDependencies": {
     "@microsoft/eslint-config-spfx": "1.18.2",
