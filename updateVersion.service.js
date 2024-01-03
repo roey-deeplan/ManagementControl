@@ -30,7 +30,7 @@ function updateVersion() {
         console.log("Current version:", json.solution.version);
         json.solution.version = incrementVersion(json.solution.version);
         fs.writeFileSync(filePath, JSON.stringify(json, json.solution.version, 2), 'utf8');
-        console.log(`Version updated to ${json.solution.version}`);
+        console.log(`Version updated: ${json.solution.version}`);
     } catch (error) {
         console.error("Error updating version:", error);
     }

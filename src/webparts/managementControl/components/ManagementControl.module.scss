@@ -1,34 +1,66 @@
-@import '~@fluentui/react/dist/sass/References.scss';
 
-.managementControl {
-  overflow: hidden;
-  padding: 1em;
-  color: "[theme:bodyText, default: #323130]";
-  color: var(--bodyText);
-  &.teams {
-    font-family: $ms-font-family-fallbacks;
-  }
-}
+//---------------- for gulp serve Development
+:global #workbenchPageContent {
+  max-width: 100%;
+  left: 0;
+  right: 0;
 
-.welcome {
-  text-align: center;
-}
+  & > div {
+    & > div {
+      overflow: visible;
 
-.welcomeImage {
-  width: 100%;
-  max-width: 420px;
-}
+      & > div {
+        overflow: visible;
+        padding: 0;
 
-.links {
-  a {
-    text-decoration: none;
-    color: "[theme:link, default:#03787c]";
-    color: var(--link); // note: CSS Custom Properties support is limited to modern browsers only
+        .CanvasComponent {
+          .CanvasZone {
+            margin: auto;
+            padding-left: 15px;
+          }
 
-    &:hover {
-      text-decoration: underline;
-      color: "[theme:linkHovered, default: #014446]";
-      color: var(--linkHovered); // note: CSS Custom Properties support is limited to modern browsers only
+          .CanvasZone--noMargin {
+            margin: auto;
+          }
+        }
+      }
     }
   }
+}
+:global #workbenchPageContent {
+  .CanvasComponent {
+    .CanvasZone {
+      max-width: 100%;
+      padding-left: 0 !important;
+      padding-right: 0;
+
+      .CanvasSection {
+        padding-left: 0;
+        padding-right: 0;
+
+        .ControlZone {
+          padding: 0;
+
+          .CanvasControlToolbar {
+            left: -32px;
+          }
+        }
+      }
+    }
+  }
+}
+
+.container {
+  display: flex;
+}
+
+.subHeadLine {
+  display: flex;
+  text-wrap: nowrap;
+  justify-content: center;
+  padding: 0em 1em 0em 1em;
+}
+
+.dataGridStyle {
+  border-radius: inherit !important;
 }
