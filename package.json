@@ -8,10 +8,12 @@
   "main": "lib/index.js",
   "scripts": {
     "build": "node updateVersion.service.js && npm run clean && npm run bundle && npm run package-solution && npm run open-explorer",
+    "build-no-update-version": "npm run clean && npm run bundle && npm run package-solution && npm run open-explorer",
     "clean": "gulp clean",
     "bundle": "gulp bundle --ship --continueOnError",
     "package-solution": "gulp package-solution --ship",
     "open-explorer": "start sharepoint\\solution",
+    "deploy": "powershell -File ./deployApp.service.ps1",
     "start": "gulp bundle --custom-serve --max_old_space_size=4096 && fast-serve",
     "serve": "fast-serve"
   },

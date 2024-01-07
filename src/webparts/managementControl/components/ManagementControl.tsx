@@ -1,39 +1,40 @@
 import * as React from 'react';
-
-import styles from './ManagementControl.module.scss';
-import "./ManagementControl.module.scss"
-
-import InputLabel from '@mui/material/InputLabel';
-import MenuItem from '@mui/material/MenuItem';
-import FormControl from '@mui/material/FormControl';
-import { DataGrid, GridColDef, GridColumnGroupingModel } from '@mui/x-data-grid';
-import Typography from '@mui/material/Typography';
-import Select, { SelectChangeEvent } from '@mui/material/Select';
-
-import type { IManagementControlProps } from './IManagementControlProps';
-import getSP from "../PnPjsConfig";
+import { DataGrid, GridToolbar } from '@mui/x-data-grid';
 import { v4 as uuidv4 } from 'uuid';
-import { PagedItemCollection } from '@pnp/sp/items';
+import getSP from "../PnPjsConfig";
+import FormControl from '@mui/material/FormControl';
+import InputLabel from '@mui/material/InputLabel';
+import Select, { SelectChangeEvent } from '@mui/material/Select';
+import MenuItem from '@mui/material/MenuItem';
+import styles from './ManagementControl.module.scss';
+import "./style.css"
+import "./ManagementControl.module.scss";
+import type { IManagementControlProps } from './IManagementControlProps';
+
 export interface IManagementControlState {
   products: any[];
-  
-  itemData: {
-    productId: string;
-    DateOfPurification: Date,
+  productId: string;
+  AntibodyPurificationData: {
+    DateOfPurification: string,
     SerumNumber: string;
     ICANumber: string;
     ColumnNumber: string;
-    TotalQuantity: number;
+    TotalQuantity: string;
     ExtraYieldCV: string;
-    ColumnPreparationDate: Date;
-    LabellingDate: Date;
-    BlockingPeptidePreparationDate: Date;
-    PeptideSupplier: string;
-    IFC: string;
-    IHC: string;
     LotNumber: string;
-    EmployeeName: string;
-  }
+  };
+  AntiBPureRows: any[];
+  ColumnPreparationDate: string;
+  ColumnPreparationDateRows: any[];
+  LabellingDate: string;
+  LabellingDateRows: any[];
+  peptidePrepData: {
+    BlockingPeptidePreparationDate: string,
+    PeptideSupplier: string,
+  };
+  peptidePrepRows: any[];
+
+  isLoading: boolean;
 }
 
 export default class ManagementControl extends React.Component<IManagementControlProps, IManagementControlState> {
@@ -41,26 +42,30 @@ export default class ManagementControl extends React.Component<IManagementContro
 
   constructor(props: IManagementControlProps) {
     super(props);
-
     this.state = {
       products: [],
-      itemData: {
-        productId: "", 
-        DateOfPurification: null as any,
+      productId: "",
+      AntibodyPurificationData: {
+        DateOfPurification: "",
         SerumNumber: "",
         ICANumber: "",
         ColumnNumber: "",
-        TotalQuantity: 0,
+        TotalQuantity: "",
         ExtraYieldCV: "",
-        ColumnPreparationDate: null as any,
-        LabellingDate: null as any,
-        BlockingPeptidePreparationDate: null as any,
-        PeptideSupplier: "",
-        IFC: "",
-        IHC: "",
         LotNumber: "",
-        EmployeeName: "",
-      }
+      },
+      AntiBPureRows: [],
+      ColumnPreparationDate: "",
+      ColumnPreparationDateRows: [],
+      LabellingDate: "",
+      LabellingDateRows: [],
+      peptidePrepData: {
+        BlockingPeptidePreparationDate: "",
+        PeptideSupplier: "",
+      },
+      peptidePrepRows: [],
+
+      isLoading: false,
     };
   }
 
@@ -69,22 +74,22 @@ export default class ManagementControl extends React.Component<IManagementContro
   }
 
   async onInit() {
+    this.setState({ isLoading: true })
     const products = await this.sp.web.lists.getById(this.props.ProductsListId).items();
-    console.log("componentDidMount - products:", products);
-    this.setState({ products: products });
+    this.setState({ products: products, isLoading: false });
   }
 
   // Generic onChange
   onChange = (e: SelectChangeEvent) => {
-    const { name, value } = e.target;  
-    
+    const { name, value } = e.target;
+
     this.setState({
-      itemData: {
-        ...this.state.itemData,
-        [name]: value
-      },
-    }, ()=>{
-      
+      productId: value,
+      AntiBPureRows: [],
+      ColumnPreparationDateRows: [],
+      LabellingDateRows: [],
+      peptidePrepRows: []
+    }, () => {
       this.fetchProductDataFromLists()
     });
   };
@@ -92,172 +97,189 @@ export default class ManagementControl extends React.Component<IManagementContro
   async fetchProductDataFromLists() {
 
     const lists = await this.sp.web.lists()
-    //console.log("fetchProductDataFromLists - lists:", lists)
-    const newItems: any[] = [];
 
     const getItemsReq = lists.map(async (l: any) => {
       try {
-        const items: PagedItemCollection<any[]> = await this.sp.web.lists.getById(l.Id).items.filter(`ProductId eq '${this.state.itemData.productId}'`).getPaged();
-        
-        newItems.push(...items.results)
+        const items: any = await this.sp.web.lists.getById(l.Id).items.filter(`ProductId eq '${this.state.productId}'`).getPaged();
+        if (items.results?.length) {
+        }
+        console.log("getItemsReq - items:", items)
+        items.results.forEach((r: any) => {
+          if (r?.DevType === "AntibodyPurification") {
 
-        return items;
+            const AntibodyPurificationData = {
+              DateOfPurification: this.formatDate(r?.DateOfPurification) || "-",
+              SerumNumber: r?.SerumNumber || "-",
+              ICANumber: r?.OData__x0023_ICA || "-",
+              ColumnNumber: r?.ColumnNumber || "-",
+              TotalQuantity: r?.Total_x0028_mg_x0029_CA || "-",
+              ExtraYieldCV: r?.ExtraYieldForStorageMG || "-",
+              LotNumber: r?.LotNumber || "-"
+            }
+            this.setState({
+              AntibodyPurificationData: AntibodyPurificationData,
+              AntiBPureRows: [...this.state.AntiBPureRows, AntibodyPurificationData]
+            })
+          }
+          if (r?.DevType === "ColumnPreparation" || r?.DevType === "ColumnPreparationForFusionPeptide") {
+            const ColPrepDate = this.formatDate(r?.DateOfColumnPreparation) || "-"
+            this.setState({
+              ColumnPreparationDate: ColPrepDate,
+              ColumnPreparationDateRows: [...this.state.ColumnPreparationDateRows, ColPrepDate]
+            })
+          }
+          if (r?.DevType === "AntibodyLabelling") {
+            const LabellingDate = this.formatDate(r?.LabellingDate) || "-"
+            this.setState({
+              LabellingDate: LabellingDate,
+              LabellingDateRows: [...this.state.LabellingDateRows, LabellingDate]
+            })
+          }
+          if (r?.DevType === "BlockingPeptidePreparation") {
+            const peptidePrepData = {
+              BlockingPeptidePreparationDate: this.formatDate(r?.BlockingPeptidePreparationDate) || "-",
+              PeptideSupplier: r?.Supplier || "-"
+            }
+
+            this.setState({
+              peptidePrepData: peptidePrepData,
+              peptidePrepRows: [...this.state.peptidePrepRows, peptidePrepData]
+            })
+          }
+        })
       } catch (err) {
         return null;
       }
-      // if (items?.length) {
-      //   items.forEach(i => i.listId = l.Id)
-      // }
     })
 
-    Promise.all(getItemsReq).then(res => {
-      console.log("fetchProductDataFromLists - newItems:", newItems)
+    Promise.all(getItemsReq).then(() => {
+      //console.log("fetchProductDataFromLists - newItems:", newItems)
     })
+  }
+
+  formatDate = (date: string) => {
+    let realDate = new Date(date)
+    let dd = String(realDate.getDate());
+    let mm = String(realDate.getMonth() + 1); //January is 0!
+    let yyyy = String(realDate.getFullYear());
+    return dd + "/" + mm + "/" + yyyy;
+  }
+
+  renderTable() {
+    const columns = [
+      { field: 'DateOfPurification', headerName: 'Date Of Purification', width: 200 },
+      { field: 'SerumNumber', headerName: 'Serum Number', width: 200 },
+      { field: 'ICANumber', headerName: 'ICA Number', width: 200 },
+      { field: 'ColumnNumber', headerName: 'Column Number', width: 200 },
+      { field: 'TotalQuantity', headerName: 'Total Quantity', width: 200 },
+      { field: 'ExtraYieldCV', headerName: 'Extra Yield [C], (V)', width: 200 },
+      { field: 'LotNumber', headerName: 'Lot Number', width: 200 },
+      { field: 'LabellingDate', headerName: 'Labelling Date', width: 200 },
+      { field: 'ColumnPreparationDate', headerName: 'Column Preparation Date', width: 200 },
+      { field: 'BlockingPeptidePreparationDate', headerName: 'Blocking Peptide Preparation Date', width: 250 },
+      { field: 'PeptideSupplier', headerName: 'Peptide Supplier', width: 200 },
+    ];
+
+    const rows = this.state.AntiBPureRows.map((row, index) => ({
+      id: uuidv4(),
+      DateOfPurification: row.DateOfPurification,
+      SerumNumber: row.SerumNumber,
+      ICANumber: row.ICANumber,
+      ColumnNumber: row.ColumnNumber,
+      TotalQuantity: row.TotalQuantity,
+      ExtraYieldCV: row.ExtraYieldCV,
+      LotNumber: row.LotNumber,
+      LabellingDate: this.state.LabellingDateRows[index],
+      ColumnPreparationDate: this.state.ColumnPreparationDateRows[index],
+      BlockingPeptidePreparationDate: this.state.peptidePrepRows[index]?.BlockingPeptidePreparationDate,
+      PeptideSupplier: this.state.peptidePrepRows[index]?.PeptideSupplier,
+    }));
+
+    return (
+      <div style={{ height: 400, width: '100%' }}>
+        <DataGrid
+          className={styles.dateGridToolBar}
+          rows={rows}
+          columns={columns}
+          slots={{
+            toolbar: GridToolbar,
+          }}
+          sx={{
+            '& .MuiDataGrid-virtualScroller::-webkit-scrollbar': {
+              width: '0.4em',
+            },
+            '& .MuiDataGrid-virtualScroller::-webkit-scrollbar-track': {
+              background: '#f1f1f1',
+            },
+            '& .MuiDataGrid-virtualScroller::-webkit-scrollbar-thumb': {
+              backgroundColor: '#41a78e',
+            },
+            '& .MuiDataGrid-virtualScroller::-webkit-scrollbar-thumb:hover': {
+              background: '#41a78e',
+            },
+          }}
+        />
+      </div>
+    );
   }
 
   public render(): React.ReactElement<IManagementControlProps> {
     const { Title } = this.props;
 
-    const columns: GridColDef[] = [
-      { field: 'id', headerName: 'ProductId', width: 150 },
-      { field: 'dateOfPurification', headerName: 'Date of Purification', width: 150 },
-      { field: 'serumNumber', headerName: 'Serum Number', width: 130 },
-      { field: 'icaNumber', headerName: 'ICA Number', width: 130 },
-      { field: 'columnNumber', headerName: 'Column Number', width: 130 },
-      { field: 'totalQuantity', headerName: 'Total Quantity (mg)', width: 180 },
-      { field: 'extraYield', headerName: 'Extra Yield [C], (V)', width: 170 },
-      { field: 'columnPreparationDate', headerName: 'Column Preparation Date', width: 180 },
-      { field: 'labellingDate', headerName: 'Labelling Date', width: 150 },
-      { field: 'blockingPeptidePreparationDate', headerName: 'Blocking Peptide Preparation Date', width: 250 },
-      { field: 'peptideSupplier', headerName: 'Peptide Supplier', width: 150 },
-      { field: 'ifc', headerName: 'IFC', width: 200 },
-      { field: 'ihc', headerName: 'IHC', width: 200 },
-      { field: 'lotNumber', headerName: 'Lot Number', width: 120 },
-      { field: 'employeeName', headerName: 'Employee Name', width: 150 },
-    ];
-    
-    const rows = [
-      {
-        id: this.state.itemData.productId,
-        dateOfPurification: '2024-01-01',
-        serumNumber: 'S123',
-        icaNumber: 'ICA456',
-        columnNumber: 'CN789',
-        columnPreparationDate: '2024-01-02',
-        totalQuantity: 50,
-        extraYield: 'Yes',
-        labellingDate: '2024-01-03',
-        blockingPeptidePreparationDate: '2024-01-04',
-        peptideSupplier: 'Supplier A',
-        ifc: 'Yes',
-        ihc: 'No',
-        lotNumber: 'L1234',
-        employeeName: 'John Doe'
-      },
-      // Add more rows as needed
-    ];
-
-    const columnGroupingModel: GridColumnGroupingModel = [
-      {
-        groupId: 'Development',
-        description: 'Development',
-        children: [
-          {
-            groupId: 'Antibody Purification',
-            description: 'Antibody Purification',
-            children: [
-              { field: 'dateOfPurification' },
-              { field: 'serumNumber' },
-              { field: 'icaNumber' },
-              { field: 'columnNumber' },
-              { field: 'totalQuantity' },
-              { field: 'extraYield' },
-            ],
-          },
-          {
-            groupId: 'Column preparation / Column preparation for fusion protein',
-            description: 'Column preparation / Column preparation for fusion protein',
-            children: [
-              { field: 'columnPreparationDate' },
-            ],
-          },
-          {
-            groupId: 'Fluorophore Labelling',
-            description: 'Fluorophore Labelling',
-            children: [
-              { field: 'labellingDate' },
-            ],
-          },
-          {
-            groupId: 'Blocking peptide preparation / fusion blocking peptide preparation',
-            description: 'Blocking peptide preparation / fusion blocking peptide preparation',
-            children: [
-              { field: 'blockingPeptidePreparationDate' },
-              { field: 'peptideSupplier' },
-            ],
-          },
-        ],
-      },
-      {
-        groupId: 'Applications',
-        description: 'Applications',
-        children: [
-          {
-            groupId: 'Indirect flow cytometry',
-            description: 'Indirect flow cytometry',
-            children: [
-              { field: 'ifc' },
-            ]
-          },
-          {
-            groupId: 'Imuunohistochemistry',
-            description: 'Imuunohistochemistry',
-            children: [
-              { field: 'ihc' },
-            ]
-          },
-          { field: 'lotNumber' },
-          { field: 'employeeName' },
-        ],
-      },
-    ];
-    
     return (
-      <section style={{padding: "1em"}}>
-        <h1>{Title}</h1>
-        <FormControl sx={{ m: 1, minWidth: 120 }} size="small">
-          <InputLabel id="demo-select-small-label">Products</InputLabel>
-          <Select
-            labelId="demo-select-small-label"
-            id="demo-select-small"
-            value={this.state.itemData.productId}
-            label="Product"
-            name={"productId"}
-            onChange={this.onChange}
-          >
-            <MenuItem value="">
-              <em>None</em>
-            </MenuItem>
-            {this.state.products.map((item) => (
-              <MenuItem key={uuidv4()} value={item.Id}>{item.ProductName.Description}</MenuItem>
-            ))}
-          </Select>
-        </FormControl>
-        
-          <div className={styles.container} style={{ height: 800, width: '100%', overflow: "auto" }}>
-            <div>
-              <DataGrid
-                experimentalFeatures={{ columnGrouping: true }}
-                rows={rows}
-                columns={columns}
-                checkboxSelection={false}
-                disableRowSelectionOnClick
-                columnGroupingModel={columnGroupingModel}
-              />
-            </div>
-      
+      <div className="EONewFormContainer">
+
+        <div className="EOHeader">
+          <div className="EOLogoContainer"></div>
+          <div className="EOHeaderContainer">
+            <span className="EOHeaderText">{Title}</span>
+          </div>
         </div>
-      </section>
+        {this.state.isLoading ? (
+          <div className="SpinnerComp">
+            <div className="loading-screen">
+              <div className="loader-wrap">
+                <span className="loader-animation"></span>
+                <div className="loading-text">
+                  <span className="letter">L</span>
+                  <span className="letter">o</span>
+                  <span className="letter">a</span>
+                  <span className="letter">d</span>
+                  <span className="letter">i</span>
+                  <span className="letter">n</span>
+                  <span className="letter">g</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        ) : (
+
+          <section style={{ padding: "1em", textAlign: 'left' }}>
+            <FormControl sx={{ m: 1, minWidth: 120, margin: 0, marginBottom: "1em" }} size="small">
+              <InputLabel id="demo-select-small-label">Products</InputLabel>
+              <Select
+                labelId="demo-select-small-label"
+                id="demo-select-small"
+                value={this.state.productId}
+                label="Product"
+                name={"productId"}
+                onChange={this.onChange}
+              >
+                <MenuItem value="">
+                  <em>None</em>
+                </MenuItem>
+                {this.state.products.map((item) => (
+                  <MenuItem key={uuidv4()} value={item.Id}>{item.ProductName.Description}</MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+            <div className={styles.container}>
+              {this.renderTable()}
+            </div>
+          </section>
+        )}
+      </div>
+
     );
   }
 }

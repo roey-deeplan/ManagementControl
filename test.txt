@@ -1,0 +1,22 @@
+# Test PowerShell Script
+
+# Print a welcome message
+Write-Host "Hello from PowerShell!"
+
+# Display the current date and time
+Write-Host "The current date and time is: $(Get-Date)"
+
+
+param(
+    [string]$AppCatalogURL = "https://alomone.sharepoint.com/sites/appcatalog/AppCatalog/Forms/AllItems.aspx",
+    [string]$AppFilePath = "./sharepoint/solution/management-control.sppkg"
+)
+
+#Connect to SharePoint Online App Catalog site
+Connect-PnPOnline -Url $AppCatalogURL -Interactive
+
+#Add App to App catalog - upload app to sharepoint online app catalog using powershell
+$App = Add-PnPApp -Path $AppFilePath
+ 
+#Deploy App to the Tenant
+Publish-PnPApp -Identity $App.ID -Scope Tenant
