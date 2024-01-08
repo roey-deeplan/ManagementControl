@@ -20,23 +20,7 @@ const { solution } = require("../../../config/package-solution.json");
 
 export interface IManagementControlWebPartProps {
   Title: string;
-  ProductsListId: string;
-
-  //* Dev
-  DevAntibodyLabellingId: string;
-  DevAntibodyPurificationId: string;
-  DevBlockingPeptidepreparationId: string;
-  DevColumnPreparationId: string;
-  DevColumnPreparationForFusionPeptideId: string;
-  DevFusionBlockingPeptidePreparationId: string;
-  //* QC
-  QcDirectFlowCytometryId: string;
-  QcBlockingPeptideWesternBlotQcId: string;
-  QCAntibodyWesternBlotQcId: string;
-  QcImmunohistochemistryId: string;
-  //* Application
-  AppIndirectFlowCytometryId: string;
-  AppImmunohistochemistryId: string;  
+  ProductsListId: string; 
 }
 
 export default class ManagementControlWebPart extends BaseClientSideWebPart<IManagementControlWebPartProps> {
@@ -47,27 +31,7 @@ export default class ManagementControlWebPart extends BaseClientSideWebPart<IMan
       {
         Title: this.properties.Title,
         ProductsListId: this.properties.ProductsListId,
-        context: this.context,
-
-        //* Dev
-        DevAntibodyLabellingId: this.properties.DevAntibodyLabellingId,
-        DevAntibodyPurificationId: this.properties.DevAntibodyPurificationId,
-        DevBlockingPeptidepreparationId:
-          this.properties.DevBlockingPeptidepreparationId,
-        DevColumnPreparationId: this.properties.DevColumnPreparationId,
-        DevColumnPreparationForFusionPeptideId:
-          this.properties.DevColumnPreparationForFusionPeptideId,
-        DevFusionBlockingPeptidePreparationId:
-          this.properties.DevFusionBlockingPeptidePreparationId,
-        //* QC
-        QcDirectFlowCytometryId: this.properties.QcDirectFlowCytometryId,
-        QcBlockingPeptideWesternBlotQcId:
-          this.properties.QcBlockingPeptideWesternBlotQcId,
-        QCAntibodyWesternBlotQcId: this.properties.QCAntibodyWesternBlotQcId,
-        QcImmunohistochemistryId: this.properties.QcImmunohistochemistryId,
-        //* App
-        AppImmunohistochemistryId: this.properties.AppImmunohistochemistryId,
-        AppIndirectFlowCytometryId: this.properties.AppIndirectFlowCytometryId,        
+        context: this.context       
       }
     );
 
@@ -156,179 +120,7 @@ export default class ManagementControlWebPart extends BaseClientSideWebPart<IMan
                   key: "listPickerFieldId",
                 }),
               ]
-            },
-            {
-              groupName: "Development Lists",
-              groupFields: [
-                PropertyFieldListPicker("DevAntibodyPurificationId", {
-                  label: "AntibodyPurification list",
-                  selectedList: this.properties.DevAntibodyPurificationId,
-                  includeHidden: false,
-                  orderBy: PropertyFieldListPickerOrderBy.Title,
-                  disabled: false,
-                  onPropertyChange: this.onPropertyPaneFieldChanged.bind(this),
-                  properties: this.properties,
-                  context: this.context as any,
-                  deferredValidationTime: 0,
-                  key: "listPickerFieldId",
-                }),
-                PropertyFieldListPicker("DevAntibodyLabellingId", {
-                  label: "AntibodyLabelling list",
-                  selectedList: this.properties.DevAntibodyLabellingId,
-                  includeHidden: false,
-                  orderBy: PropertyFieldListPickerOrderBy.Title,
-                  disabled: false,
-                  onPropertyChange: this.onPropertyPaneFieldChanged.bind(this),
-                  properties: this.properties,
-                  context: this.context as any,
-                  deferredValidationTime: 0,
-                  key: "listPickerFieldId",
-                }),
-                PropertyFieldListPicker("DevBlockingPeptidepreparationId", {
-                  label: "BlockingPeptidePreparation list",
-                  selectedList: this.properties.DevBlockingPeptidepreparationId,
-                  includeHidden: false,
-                  orderBy: PropertyFieldListPickerOrderBy.Title,
-                  disabled: false,
-                  onPropertyChange: this.onPropertyPaneFieldChanged.bind(this),
-                  properties: this.properties,
-                  context: this.context as any,
-                  deferredValidationTime: 0,
-                  key: "listPickerFieldId",
-                }),
-                PropertyFieldListPicker("DevColumnPreparationId", {
-                  label: "ColumnPreparation list",
-                  selectedList: this.properties.DevColumnPreparationId,
-                  includeHidden: false,
-                  orderBy: PropertyFieldListPickerOrderBy.Title,
-                  disabled: false,
-                  onPropertyChange: this.onPropertyPaneFieldChanged.bind(this),
-                  properties: this.properties,
-                  context: this.context as any,
-                  deferredValidationTime: 0,
-                  key: "listPickerFieldId",
-                }),
-                PropertyFieldListPicker(
-                  "DevColumnPreparationForFusionPeptideId",
-                  {
-                    label: "ColumnPreparationForFusionPeptide list",
-                    selectedList:
-                      this.properties.DevColumnPreparationForFusionPeptideId,
-                    includeHidden: false,
-                    orderBy: PropertyFieldListPickerOrderBy.Title,
-                    disabled: false,
-                    onPropertyChange:
-                      this.onPropertyPaneFieldChanged.bind(this),
-                    properties: this.properties,
-                    context: this.context as any,
-                    deferredValidationTime: 0,
-                    key: "listPickerFieldId",
-                  }
-                ),
-                PropertyFieldListPicker(
-                  "DevFusionBlockingPeptidePreparationId",
-                  {
-                    label: "FusionBlockingPeptidePreparation list",
-                    selectedList:
-                      this.properties.DevFusionBlockingPeptidePreparationId,
-                    includeHidden: false,
-                    orderBy: PropertyFieldListPickerOrderBy.Title,
-                    disabled: false,
-                    onPropertyChange:
-                      this.onPropertyPaneFieldChanged.bind(this),
-                    properties: this.properties,
-                    context: this.context as any,
-                    deferredValidationTime: 0,
-                    key: "listPickerFieldId",
-                  }
-                ),
-              ],
-            },
-            {
-              groupName: "QC Lists",
-              groupFields: [
-                PropertyFieldListPicker("QcDirectFlowCytometryId", {
-                  label: "DirectFlowCytometry list",
-                  selectedList: this.properties.QcDirectFlowCytometryId,
-                  includeHidden: false,
-                  orderBy: PropertyFieldListPickerOrderBy.Title,
-                  disabled: false,
-                  onPropertyChange: this.onPropertyPaneFieldChanged.bind(this),
-                  properties: this.properties,
-                  context: this.context as any,
-                  deferredValidationTime: 0,
-                  key: "listPickerFieldId",
-                }),
-                PropertyFieldListPicker("QcBlockingPeptideWesternBlotQcId", {
-                  label: "BlockingPeptideWesternBlotQc list",
-                  selectedList:
-                    this.properties.QcBlockingPeptideWesternBlotQcId,
-                  includeHidden: false,
-                  orderBy: PropertyFieldListPickerOrderBy.Title,
-                  disabled: false,
-                  onPropertyChange: this.onPropertyPaneFieldChanged.bind(this),
-                  properties: this.properties,
-                  context: this.context as any,
-                  deferredValidationTime: 0,
-                  key: "listPickerFieldId",
-                }),
-                PropertyFieldListPicker("QCAntibodyWesternBlotQcId", {
-                  label: "AntibodyWesternBlotQc list",
-                  selectedList: this.properties.QCAntibodyWesternBlotQcId,
-                  includeHidden: false,
-                  orderBy: PropertyFieldListPickerOrderBy.Title,
-                  disabled: false,
-                  onPropertyChange: this.onPropertyPaneFieldChanged.bind(this),
-                  properties: this.properties,
-                  context: this.context as any,
-                  deferredValidationTime: 0,
-                  key: "listPickerFieldId",
-                }),
-                PropertyFieldListPicker("QcImmunohistochemistryId", {
-                  label: "Immunohistochemistry list",
-                  selectedList: this.properties.QcImmunohistochemistryId,
-                  includeHidden: false,
-                  orderBy: PropertyFieldListPickerOrderBy.Title,
-                  disabled: false,
-                  onPropertyChange: this.onPropertyPaneFieldChanged.bind(this),
-                  properties: this.properties,
-                  context: this.context as any,
-                  deferredValidationTime: 0,
-                  key: "listPickerFieldId",
-                }),
-              ],
-            },
-            {
-              groupName: "Applications Lists",
-              groupFields: [
-                PropertyFieldListPicker("AppIndirectFlowCytometryId", {
-                  label: "IndirectFlowCytometry list",
-                  selectedList: this.properties.AppIndirectFlowCytometryId,
-                  includeHidden: false,
-                  orderBy: PropertyFieldListPickerOrderBy.Title,
-                  disabled: false,
-                  onPropertyChange: this.onPropertyPaneFieldChanged.bind(this),
-                  properties: this.properties,
-                  context: this.context as any,
-                  deferredValidationTime: 0,
-                  key: "listPickerFieldId",
-                }),
-
-                PropertyFieldListPicker("AppImmunohistochemistryId", {
-                  label: "Immunohistochemistry list",
-                  selectedList: this.properties.AppImmunohistochemistryId,
-                  includeHidden: false,
-                  orderBy: PropertyFieldListPickerOrderBy.Title,
-                  disabled: false,
-                  onPropertyChange: this.onPropertyPaneFieldChanged.bind(this),
-                  properties: this.properties,
-                  context: this.context as any,
-                  deferredValidationTime: 0,
-                  key: "listPickerFieldId",
-                }),
-              ],
-            },
-            
+            },          
           ]
         }
       ]

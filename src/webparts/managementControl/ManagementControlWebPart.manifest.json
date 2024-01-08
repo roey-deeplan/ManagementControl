@@ -20,22 +20,7 @@
     "officeFabricIconFontName": "TaskManager",
     "properties": {
       "Title": "Management Control",
-      "ProductsListId": "cc70ca4f-ee0a-4ea8-a921-f13428228919",
-
-      "DevAntibodyLabellingId": "272588ca-66b8-4566-8d53-e30eaa677dc2",
-      "DevAntibodyPurificationId": "a3ba8509-fd15-4510-80fb-8c2d8db0aea9",
-      "DevBlockingPeptidepreparationId": "bbb3bf9f-12b7-4a40-91b3-a703a2fd6b43",
-      "DevColumnPreparationId": "acc4cb3f-e552-42a3-bd60-529004bc751e",
-      "DevColumnPreparationForFusionPeptideId": "cc9b12b5-591e-435b-9629-ac20bd97ec9e",
-      "DevFusionBlockingPeptidePreparationId": "70e7e7a2-3d56-46ae-81e9-f213c70f9518",
-
-      "QcDirectFlowCytometryId": "f9b56c48-45f4-4025-b4de-076304940171",
-      "QcBlockingPeptideWesternBlotQcId": "a6c96b90-6785-4c3b-8a45-62bcfb067229",
-      "QCAntibodyWesternBlotQcId": "04354856-d67a-470a-8a1d-fac8be75226d",
-      "QcImmunohistochemistryId": "0c7f56fb-ae8f-4cf5-a347-f0e28718948e",
-
-      "AppImmunohistochemistryId": "d709625d-8501-4650-bb5d-715c03d7e5d9",
-      "AppIndirectFlowCytometryId": "51a213a9-ea76-40a5-ab91-ff0ff8e239be"
+      "ProductsListId": "cc70ca4f-ee0a-4ea8-a921-f13428228919"
     }
   }]
 }
