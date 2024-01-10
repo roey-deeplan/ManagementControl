@@ -10,6 +10,7 @@ import styles from './ManagementControl.module.scss';
 import "./style.css"
 import "./ManagementControl.module.scss";
 import type { IManagementControlProps } from './IManagementControlProps';
+import Skeleton from '@mui/material/Skeleton';
 
 export interface IManagementControlState {
   products: any[];
@@ -222,6 +223,18 @@ export default class ManagementControl extends React.Component<IManagementContro
       </div>
     );
   }
+
+  renderSkeletons() {
+    const skeletonRows = Array.from(new Array(5)); // Number of skeletons
+    return (
+      <div style={{ height: 400, width: '100%' }}>
+        {skeletonRows.map((_, index) => (
+          <Skeleton key={index} variant="rectangular" height={30} style={{ marginBottom: 8 }} />
+        ))}
+      </div>
+    );
+  }
+  
 
   public render(): React.ReactElement<IManagementControlProps> {
     const { Title } = this.props;
