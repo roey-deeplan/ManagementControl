@@ -36,6 +36,7 @@ export interface IManagementControlState {
   peptidePrepRows: any[];
 
   isLoading: boolean;
+  skeletonLoading: boolean;
 }
 
 export default class ManagementControl extends React.Component<IManagementControlProps, IManagementControlState> {
@@ -67,6 +68,7 @@ export default class ManagementControl extends React.Component<IManagementContro
       peptidePrepRows: [],
 
       isLoading: false,
+      skeletonLoading: false,
     };
   }
 
@@ -91,6 +93,7 @@ export default class ManagementControl extends React.Component<IManagementContro
       LabellingDateRows: [],
       peptidePrepRows: []
     }, () => {
+      this.setState({skeletonLoading: true})
       this.fetchProductDataFromLists()
     });
   };
@@ -155,6 +158,9 @@ export default class ManagementControl extends React.Component<IManagementContro
 
     Promise.all(getItemsReq).then(() => {
       //console.log("fetchProductDataFromLists - newItems:", newItems)
+      this.setState({
+        skeletonLoading: false
+      })
     })
   }
 
@@ -204,6 +210,7 @@ export default class ManagementControl extends React.Component<IManagementContro
           columns={columns}
           slots={{
             toolbar: GridToolbar,
+            noRowsOverlay: this.state.skeletonLoading ? this.renderSkeletons : undefined
           }}
           sx={{
             '& .MuiDataGrid-virtualScroller::-webkit-scrollbar': {
@@ -225,9 +232,9 @@ export default class ManagementControl extends React.Component<IManagementContro
   }
 
   renderSkeletons() {
-    const skeletonRows = Array.from(new Array(5)); // Number of skeletons
+    const skeletonRows = Array.from(new Array(6)); // Number of skeletons
     return (
-      <div style={{ height: 400, width: '100%' }}>
+      <div style={{ height: 0, width: '100%' }}>
         {skeletonRows.map((_, index) => (
           <Skeleton key={index} variant="rectangular" height={30} style={{ marginBottom: 8 }} />
         ))}
@@ -266,8 +273,8 @@ export default class ManagementControl extends React.Component<IManagementContro
             </div>
           </div>
         ) : (
-
           <section style={{ padding: "1em", textAlign: 'left' }}>
+            
             <FormControl sx={{ m: 1, minWidth: 120, margin: 0, marginBottom: "1em" }} size="small">
               <InputLabel id="demo-select-small-label">Products</InputLabel>
               <Select
