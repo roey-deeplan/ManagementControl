@@ -14,19 +14,22 @@ div[data-automation-id="CanvasLayout"] div.CanvasZone {
 .MuiDataGrid-cell--textRight {
     justify-content: center !important;
 }
-
+.ms-SPLegacyFabricBlock {
+    padding-top: 1.5em;
+}
 /* Main */
 .EONewFormContainer {
     display: block;
     position: relative;
     margin-left: auto;
     margin-right: auto;
-    width: 100%;
     box-shadow: 0 3px 10px rgb(0 0 0 / 0.2);
     border-radius: 5px;
     padding: 1%;
     background-color: white;
     min-height: 400px;
+    width: 95% !important;
+    margin-top: 1em;
 }
 
 /* HeaderStyle */

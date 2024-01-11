@@ -1,55 +1,55 @@
 @import '~@fluentui/react/dist/sass/References.scss';
 
 //---------------- for gulp serve Development
-// :global #workbenchPageContent {
-//   max-width: 100%;
-//   left: 0;
-//   right: 0;
+:global #workbenchPageContent {
+  max-width: 100%;
+  left: 0;
+  right: 0;
 
-//   & > div {
-//     & > div {
-//       overflow: visible;
+  & > div {
+    & > div {
+      overflow: visible;
 
-//       & > div {
-//         overflow: visible;
-//         padding: 0;
+      & > div {
+        overflow: visible;
+        padding: 0;
 
-//         .CanvasComponent {
-//           .CanvasZone {
-//             margin: auto;
-//             padding-left: 15px;
-//           }
+        .CanvasComponent {
+          .CanvasZone {
+            margin: auto;
+            padding-left: 15px;
+          }
 
-//           .CanvasZone--noMargin {
-//             margin: auto;
-//           }
-//         }
-//       }
-//     }
-//   }
-// }
-// :global #workbenchPageContent {
-//   .CanvasComponent {
-//     .CanvasZone {
-//       max-width: 100%;
-//       padding-left: 0 !important;
-//       padding-right: 0;
+          .CanvasZone--noMargin {
+            margin: auto;
+          }
+        }
+      }
+    }
+  }
+}
+:global #workbenchPageContent {
+  .CanvasComponent {
+    .CanvasZone {
+      max-width: 100%;
+      padding-left: 0 !important;
+      padding-right: 0;
 
-//       .CanvasSection {
-//         padding-left: 0;
-//         padding-right: 0;
+      .CanvasSection {
+        padding-left: 0;
+        padding-right: 0;
 
-//         .ControlZone {
-//           padding: 0;
+        .ControlZone {
+          padding: 0;
 
-//           .CanvasControlToolbar {
-//             left: -32px;
-//           }
-//         }
-//       }
-//     }
-//   }
-// }
+          .CanvasControlToolbar {
+            left: -32px;
+          }
+        }
+      }
+    }
+  }
+}
 
 .container {
   display: flex;

@@ -104,60 +104,64 @@ export default class ManagementControl extends React.Component<IManagementContro
 
     const getItemsReq = lists.map(async (l: any) => {
       try {
-        const items: any = await this.sp.web.lists.getById(l.Id).items.filter(`ProductId eq '${this.state.productId}'`).getPaged();
-        if (items.results?.length) {
+        let items: any = await this.sp.web.lists.getById(l.Id).items.filter(`ProductId eq '${this.state.productId}'`).getPaged();
+
+        // the results property will be an array of the items returned
+        if (items.results?.length > 0) {
+          items.results.forEach((r: any) => {
+            if (r?.DevType === "AntibodyPurification") {
+              const date = this.formatDate(r?.DateOfPurification)
+              const AntibodyPurificationData = {
+                DateOfPurification: date === "1/1/1970" ? "-" : date,
+                SerumNumber: r?.SerumNumber || "-",
+                ICANumber: r?.OData__x0023_ICA || "-",
+                ColumnNumber: r?.ColumnNumber || "-",
+                TotalQuantity: r?.Total_x0028_mg_x0029_CA || "-",
+                ExtraYieldCV: r?.ExtraYieldForStorageMG || "-",
+                LotNumber: r?.LotNumber || "-"
+              }
+              this.setState({
+                AntibodyPurificationData: AntibodyPurificationData,
+                AntiBPureRows: [...this.state.AntiBPureRows, AntibodyPurificationData]
+              })
+            }
+            if (r?.DevType === "ColumnPreparation" || r?.DevType === "ColumnPreparationForFusionPeptide") {
+              const ColPrepDate = this.formatDate(r?.DateOfColumnPreparation)
+              this.setState({
+                ColumnPreparationDate: ColPrepDate === "1/1/1970" ? "-" : ColPrepDate,
+                ColumnPreparationDateRows: [...this.state.ColumnPreparationDateRows, ColPrepDate === "1/1/1970" ? "-" : ColPrepDate]
+              })
+            }
+            if (r?.DevType === "AntibodyLabelling") {
+              const LabellingDate = this.formatDate(r?.LabellingDate)
+              this.setState({
+                LabellingDate: LabellingDate === "1/1/1970" ? "-" : LabellingDate,
+                LabellingDateRows: [...this.state.LabellingDateRows, LabellingDate === "1/1/1970" ? "-" : LabellingDate]
+              })
+            }
+            if (r?.DevType === "BlockingPeptidePreparation") {
+              const date = this.formatDate(r?.BlockingPeptidePreparationDate)
+              const peptidePrepData = {
+                BlockingPeptidePreparationDate: date === "1/1/1970" ? "-" : date,
+                PeptideSupplier: r?.Supplier || "-"
+              } 
+              this.setState({
+                peptidePrepData: peptidePrepData,
+                peptidePrepRows: [...this.state.peptidePrepRows, peptidePrepData]
+              })
+            }
+          })
         }
-        console.log("getItemsReq - items:", items)
-        items.results.forEach((r: any) => {
-          if (r?.DevType === "AntibodyPurification") {
-
-            const AntibodyPurificationData = {
-              DateOfPurification: this.formatDate(r?.DateOfPurification) || "-",
-              SerumNumber: r?.SerumNumber || "-",
-              ICANumber: r?.OData__x0023_ICA || "-",
-              ColumnNumber: r?.ColumnNumber || "-",
-              TotalQuantity: r?.Total_x0028_mg_x0029_CA || "-",
-              ExtraYieldCV: r?.ExtraYieldForStorageMG || "-",
-              LotNumber: r?.LotNumber || "-"
-            }
-            this.setState({
-              AntibodyPurificationData: AntibodyPurificationData,
-              AntiBPureRows: [...this.state.AntiBPureRows, AntibodyPurificationData]
-            })
-          }
-          if (r?.DevType === "ColumnPreparation" || r?.DevType === "ColumnPreparationForFusionPeptide") {
-            const ColPrepDate = this.formatDate(r?.DateOfColumnPreparation) || "-"
-            this.setState({
-              ColumnPreparationDate: ColPrepDate,
-              ColumnPreparationDateRows: [...this.state.ColumnPreparationDateRows, ColPrepDate]
-            })
-          }
-          if (r?.DevType === "AntibodyLabelling") {
-            const LabellingDate = this.formatDate(r?.LabellingDate) || "-"
-            this.setState({
-              LabellingDate: LabellingDate,
-              LabellingDateRows: [...this.state.LabellingDateRows, LabellingDate]
-            })
-          }
-          if (r?.DevType === "BlockingPeptidePreparation") {
-            const peptidePrepData = {
-              BlockingPeptidePreparationDate: this.formatDate(r?.BlockingPeptidePreparationDate) || "-",
-              PeptideSupplier: r?.Supplier || "-"
-            }
-
-            this.setState({
-              peptidePrepData: peptidePrepData,
-              peptidePrepRows: [...this.state.peptidePrepRows, peptidePrepData]
-            })
-          }
-        })
+        if (items.hasNext) {
+          // this will carry over the type specified in the original query for the results array
+          items = await items.getNext();
+        }
       } catch (err) {
         return null;
       }
     })
 
     Promise.all(getItemsReq).then(() => {
-      //console.log("fetchProductDataFromLists - newItems:", newItems)
       this.setState({
         skeletonLoading: false
       })
@@ -203,7 +207,7 @@ export default class ManagementControl extends React.Component<IManagementContro
     }));
 
     return (
-      <div style={{ height: 400, width: '100%' }}>
+      <div style={{ width: '100%' }}>
         <DataGrid
           className={styles.dateGridToolBar}
           rows={rows}
@@ -213,6 +217,7 @@ export default class ManagementControl extends React.Component<IManagementContro
             noRowsOverlay: this.state.skeletonLoading ? this.renderSkeletons : undefined
           }}
           sx={{
+            height: rows.length === 0 ? '400px' : 'auto',
             '& .MuiDataGrid-virtualScroller::-webkit-scrollbar': {
               width: '0.4em',
             },
@@ -225,6 +230,9 @@ export default class ManagementControl extends React.Component<IManagementContro
             '& .MuiDataGrid-virtualScroller::-webkit-scrollbar-thumb:hover': {
               background: '#41a78e',
             },
+            '& .MuiDataGrid-virtualScroller': {
+              overflowY: 'hidden',
+            }
           }}
         />
       </div>
