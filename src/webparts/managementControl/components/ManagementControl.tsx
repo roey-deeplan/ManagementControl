@@ -117,9 +117,11 @@ export default class ManagementControl extends React.Component<IManagementContro
         
         let items: any = await this.sp.web.lists.getById(l.Id).items
         .filter(`ProductId eq '${this.state.productId}'`).getPaged();
+        
 
         // the results property will be an array of the items returned
         if (items.results?.length > 0) {
+          console.log("getItemsReq - items:", items.results)
           items.results.forEach((r: any) => {
             if (r?.DevType === "AntibodyPurification") {
               const date = this.formatDate(r?.DateOfPurification)
@@ -136,7 +138,22 @@ export default class ManagementControl extends React.Component<IManagementContro
                 AntibodyPurificationData: AntibodyPurificationData,
                 AntiBPureRows: [...this.state.AntiBPureRows, AntibodyPurificationData]
               })
+            } else {
+              const AntibodyPurificationData = {
+                DateOfPurification:  "",
+                SerumNumber: "",
+                ICANumber:  "",
+                ColumnNumber:  "",
+                TotalQuantity:  "",
+                ExtraYieldCV:  "",
+                LotNumber:  ""
+              }
+              this.setState({
+                AntibodyPurificationData: AntibodyPurificationData,
+                AntiBPureRows: [...this.state.AntiBPureRows, AntibodyPurificationData]
+              })
             }
+            
             if (r?.DevType === "ColumnPreparation" || r?.DevType === "ColumnPreparationForFusionPeptide") {
               const ColPrepDate = this.formatDate(r?.DateOfColumnPreparation)
               this.setState({
@@ -174,7 +191,6 @@ export default class ManagementControl extends React.Component<IManagementContro
               this.setState({
                 IHCLotNumber: r?.LotNumber,
                 IHCLotNumberRows: [...this.state.IHCLotNumberRows, r?.LotNumber]
-              }, ()=>{console.log(this.state.IHCLotNumberRows);
               })
             }
 
