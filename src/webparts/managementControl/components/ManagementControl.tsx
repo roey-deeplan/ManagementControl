@@ -35,6 +35,11 @@ export interface IManagementControlState {
   };
   peptidePrepRows: any[];
 
+  IFCLotNumber: string;
+  IFCLotNumberRows: any[],
+  IHCLotNumber: string;
+  IHCLotNumberRows: any[],
+
   isLoading: boolean;
   skeletonLoading: boolean;
 }
@@ -66,6 +71,11 @@ export default class ManagementControl extends React.Component<IManagementContro
         PeptideSupplier: "",
       },
       peptidePrepRows: [],
+
+      IFCLotNumber: "",
+      IFCLotNumberRows: [],
+      IHCLotNumber: "",
+      IHCLotNumberRows: [],
 
       isLoading: false,
       skeletonLoading: false,
@@ -104,7 +114,9 @@ export default class ManagementControl extends React.Component<IManagementContro
 
     const getItemsReq = lists.map(async (l: any) => {
       try {
-        let items: any = await this.sp.web.lists.getById(l.Id).items.filter(`ProductId eq '${this.state.productId}'`).getPaged();
+        
+        let items: any = await this.sp.web.lists.getById(l.Id).items
+        .filter(`ProductId eq '${this.state.productId}'`).getPaged();
 
         // the results property will be an array of the items returned
         if (items.results?.length > 0) {
@@ -112,13 +124,13 @@ export default class ManagementControl extends React.Component<IManagementContro
             if (r?.DevType === "AntibodyPurification") {
               const date = this.formatDate(r?.DateOfPurification)
               const AntibodyPurificationData = {
-                DateOfPurification: date === "1/1/1970" ? "-" : date,
-                SerumNumber: r?.SerumNumber || "-",
-                ICANumber: r?.OData__x0023_ICA || "-",
-                ColumnNumber: r?.ColumnNumber || "-",
-                TotalQuantity: r?.Total_x0028_mg_x0029_CA || "-",
-                ExtraYieldCV: r?.ExtraYieldForStorageMG || "-",
-                LotNumber: r?.LotNumber || "-"
+                DateOfPurification: date === "1/1/1970" ? "" : date,
+                SerumNumber: r?.SerumNumber || "",
+                ICANumber: r?.OData__x0023_ICA || "",
+                ColumnNumber: r?.ColumnNumber || "",
+                TotalQuantity: r?.Total_x0028_mg_x0029_CA || "",
+                ExtraYieldCV: r?.ExtraYieldForStorageMG || "",
+                LotNumber: r?.LotNumber || ""
               }
               this.setState({
                 AntibodyPurificationData: AntibodyPurificationData,
@@ -128,28 +140,44 @@ export default class ManagementControl extends React.Component<IManagementContro
             if (r?.DevType === "ColumnPreparation" || r?.DevType === "ColumnPreparationForFusionPeptide") {
               const ColPrepDate = this.formatDate(r?.DateOfColumnPreparation)
               this.setState({
-                ColumnPreparationDate: ColPrepDate === "1/1/1970" ? "-" : ColPrepDate,
-                ColumnPreparationDateRows: [...this.state.ColumnPreparationDateRows, ColPrepDate === "1/1/1970" ? "-" : ColPrepDate]
+                ColumnPreparationDate: ColPrepDate === "1/1/1970" ? "" : ColPrepDate,
+                ColumnPreparationDateRows: [...this.state.ColumnPreparationDateRows, ColPrepDate === "1/1/1970" ? "" : ColPrepDate]
               })
             }
             if (r?.DevType === "AntibodyLabelling") {
               const LabellingDate = this.formatDate(r?.LabellingDate)
               this.setState({
-                LabellingDate: LabellingDate === "1/1/1970" ? "-" : LabellingDate,
-                LabellingDateRows: [...this.state.LabellingDateRows, LabellingDate === "1/1/1970" ? "-" : LabellingDate]
+                LabellingDate: LabellingDate === "1/1/1970" ? "" : LabellingDate,
+                LabellingDateRows: [...this.state.LabellingDateRows, LabellingDate === "1/1/1970" ? "" : LabellingDate]
               })
             }
-            if (r?.DevType === "BlockingPeptidePreparation") {
-              const date = this.formatDate(r?.BlockingPeptidePreparationDate)
+            if (r?.DevType === "BlockingPeptidePreparation" || r?.DevType === "FusionBlockingPeptidePreparation") { 
+              const date = this.formatDate(r?.BlockingPeptidePreparationDate || r?.Date)
               const peptidePrepData = {
-                BlockingPeptidePreparationDate: date === "1/1/1970" ? "-" : date,
-                PeptideSupplier: r?.Supplier || "-"
+                BlockingPeptidePreparationDate: date === "1/1/1970" ? "" : date,
+                PeptideSupplier: r?.Supplier || ""
               } 
               this.setState({
                 peptidePrepData: peptidePrepData,
                 peptidePrepRows: [...this.state.peptidePrepRows, peptidePrepData]
               })
             }
+
+            if (r?.AppType === "IndirectFlowCytometry") {
+              this.setState({
+                IFCLotNumber: r?.LotNumber,
+                IFCLotNumberRows: [...this.state.IFCLotNumberRows, r?.LotNumber]
+              })
+            }
+            if (r?.AppType === "Immunohistochemistry") {
+              
+              this.setState({
+                IHCLotNumber: r?.LotNumber,
+                IHCLotNumberRows: [...this.state.IHCLotNumberRows, r?.LotNumber]
+              }, ()=>{console.log(this.state.IHCLotNumberRows);
+              })
+            }
+
           })
         }
         if (items.hasNext) {
@@ -182,13 +210,15 @@ export default class ManagementControl extends React.Component<IManagementContro
       { field: 'SerumNumber', headerName: 'Serum Number', width: 200 },
       { field: 'ICANumber', headerName: 'ICA Number', width: 200 },
       { field: 'ColumnNumber', headerName: 'Column Number', width: 200 },
+      { field: 'ColumnPreparationDate', headerName: 'Column Preparation Date', width: 200 },
       { field: 'TotalQuantity', headerName: 'Total Quantity', width: 200 },
       { field: 'ExtraYieldCV', headerName: 'Extra Yield [C], (V)', width: 200 },
       { field: 'LotNumber', headerName: 'Lot Number', width: 200 },
       { field: 'LabellingDate', headerName: 'Labelling Date', width: 200 },
-      { field: 'ColumnPreparationDate', headerName: 'Column Preparation Date', width: 200 },
       { field: 'BlockingPeptidePreparationDate', headerName: 'Blocking Peptide Preparation Date', width: 250 },
       { field: 'PeptideSupplier', headerName: 'Peptide Supplier', width: 200 },
+      { field: 'IFC', headerName: 'Indirect flow cytometry', width: 200 },
+      { field: 'IHC', headerName: 'Immunohistochemistry', width: 200 },
     ];
 
     const rows = this.state.AntiBPureRows.map((row, index) => ({
@@ -204,6 +234,8 @@ export default class ManagementControl extends React.Component<IManagementContro
       ColumnPreparationDate: this.state.ColumnPreparationDateRows[index],
       BlockingPeptidePreparationDate: this.state.peptidePrepRows[index]?.BlockingPeptidePreparationDate,
       PeptideSupplier: this.state.peptidePrepRows[index]?.PeptideSupplier,
+      IFC: this.state.IFCLotNumberRows[index],
+      IHC: this.state.IHCLotNumberRows[index],
     }));
 
     return (
@@ -297,7 +329,7 @@ export default class ManagementControl extends React.Component<IManagementContro
                   <em>None</em>
                 </MenuItem>
                 {this.state.products.map((item) => (
-                  <MenuItem key={uuidv4()} value={item.Id}>{item.ProductName.Description}</MenuItem>
+                  <MenuItem key={uuidv4()} value={item.Id}>{item.ProductSerialNumber}</MenuItem>
                 ))}
               </Select>
             </FormControl>
