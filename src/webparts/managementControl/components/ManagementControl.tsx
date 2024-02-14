@@ -15,22 +15,24 @@ import Skeleton from '@mui/material/Skeleton';
 export interface IManagementControlState {
   products: any[];
   productId: string;
+  LotNumber: string;
+  LotNumberRows: any[];
   AntibodyPurificationData: {
-    DateOfPurification: string,
+    DateOfPurification: Date | null,
     SerumNumber: string;
     ICANumber: string;
     ColumnNumber: string;
     TotalQuantity: string;
     ExtraYieldCV: string;
-    LotNumber: string;
+    // LotNumber: string;
   };
   AntiBPureRows: any[];
-  ColumnPreparationDate: string;
+  ColumnPreparationDate: Date | null;
   ColumnPreparationDateRows: any[];
-  LabellingDate: string;
+  LabellingDate: Date | null;
   LabellingDateRows: any[];
   peptidePrepData: {
-    BlockingPeptidePreparationDate: string,
+    BlockingPeptidePreparationDate: Date | null,
     PeptideSupplier: string,
   };
   peptidePrepRows: any[];
@@ -49,25 +51,28 @@ export default class ManagementControl extends React.Component<IManagementContro
 
   constructor(props: IManagementControlProps) {
     super(props);
+    
     this.state = {
       products: [],
       productId: "",
+      LotNumber: "",
+      LotNumberRows: [],
       AntibodyPurificationData: {
-        DateOfPurification: "",
+        DateOfPurification: null,
         SerumNumber: "",
         ICANumber: "",
         ColumnNumber: "",
         TotalQuantity: "",
         ExtraYieldCV: "",
-        LotNumber: "",
+        // LotNumber: "",
       },
       AntiBPureRows: [],
-      ColumnPreparationDate: "",
+      ColumnPreparationDate: null,
       ColumnPreparationDateRows: [],
-      LabellingDate: "",
+      LabellingDate: null,
       LabellingDateRows: [],
       peptidePrepData: {
-        BlockingPeptidePreparationDate: "",
+        BlockingPeptidePreparationDate: null,
         PeptideSupplier: "",
       },
       peptidePrepRows: [],
@@ -105,6 +110,7 @@ export default class ManagementControl extends React.Component<IManagementContro
       peptidePrepRows: [],
       IFCLotNumberRows: [],
       IHCLotNumberRows: [],
+      LotNumberRows: [],
       // Reset any other relevant part of the state here.
     }, () => {
       this.setState({ skeletonLoading: true });
@@ -112,58 +118,68 @@ export default class ManagementControl extends React.Component<IManagementContro
     });
   };
 
-
   async fetchProductDataFromLists() {
 
     const lists = await this.sp.web.lists()
 
     const getItemsReq = lists.map(async (l: any) => {
       try {
-        
+
         let items: any = await this.sp.web.lists.getById(l.Id).items
-        .filter(`ProductId eq '${this.state.productId}'`).getPaged();
-        
+          .filter(`ProductId eq '${this.state.productId}'`).getPaged();
+
 
         // the results property will be an array of the items returned
         if (items.results?.length > 0) {
           items.results.forEach((r: any) => {
+            if (
+              r?.DevType === "AntibodyLabelling" ||
+              r?.DevType === "BlockingPeptidePreparation" ||
+              r?.DevType === "FusionBlockingPeptidePreparation" ||
+              r?.AppType === "Immunohistochemistry") {
+                this.setState({
+                  LotNumber: r?.LotNumber,
+                  LotNumberRows: [...this.state.LotNumberRows, r?.LotNumber]
+                })
+            }
+
             if (r?.DevType === "AntibodyPurification") {
               const date = this.formatDate(r?.DateOfPurification)
               const AntibodyPurificationData = {
-                DateOfPurification: date === "1/1/1970" ? "-" : date,
-                SerumNumber: r?.SerumNumber || "-",
-                ICANumber: r?.OData__x0023_ICA || "-",
-                ColumnNumber: r?.ColumnNumber || "-",
-                TotalQuantity: r?.Total_x0028_mg_x0029_CA || "-",
-                ExtraYieldCV: r?.ExtraYieldForStorageMG || "-",
-                LotNumber: r?.LotNumber || "-"
+                DateOfPurification: date,
+                SerumNumber: r?.SerumNumber || "",
+                ICANumber: r?.OData__x0023_ICA || "",
+                ColumnNumber: r?.ColumnNumber || "",
+                TotalQuantity: r?.Total_x0028_mg_x0029_CA || "",
+                ExtraYieldCV: r?.ExtraYieldForStorageMG || "",
+                // LotNumber: r?.LotNumber || ""
               }
               this.setState({
                 AntibodyPurificationData: AntibodyPurificationData,
                 AntiBPureRows: [...this.state.AntiBPureRows, AntibodyPurificationData]
               })
             }
-            
+
             if (r?.DevType === "ColumnPreparation" || r?.DevType === "ColumnPreparationForFusionPeptide") {
               const ColPrepDate = this.formatDate(r?.DateOfColumnPreparation)
               this.setState({
-                ColumnPreparationDate: ColPrepDate === "1/1/1970" ? "-" : ColPrepDate,
-                ColumnPreparationDateRows: [...this.state.ColumnPreparationDateRows, ColPrepDate === "1/1/1970" ? "-" : ColPrepDate]
+                ColumnPreparationDate: ColPrepDate,
+                ColumnPreparationDateRows: [...this.state.ColumnPreparationDateRows, ColPrepDate]
               })
             }
             if (r?.DevType === "AntibodyLabelling") {
               const LabellingDate = this.formatDate(r?.LabellingDate)
               this.setState({
-                LabellingDate: LabellingDate === "1/1/1970" ? "-" : LabellingDate,
-                LabellingDateRows: [...this.state.LabellingDateRows, LabellingDate === "1/1/1970" ? "-" : LabellingDate]
+                LabellingDate: LabellingDate, 
+                LabellingDateRows: [...this.state.LabellingDateRows, LabellingDate] 
               })
             }
-            if (r?.DevType === "BlockingPeptidePreparation" || r?.DevType === "FusionBlockingPeptidePreparation") { 
+            if (r?.DevType === "BlockingPeptidePreparation" || r?.DevType === "FusionBlockingPeptidePreparation") {
               const date = this.formatDate(r?.BlockingPeptidePreparationDate || r?.Date)
               const peptidePrepData = {
-                BlockingPeptidePreparationDate: date === "1/1/1970" ? "-" : date,
-                PeptideSupplier: r?.Supplier || "-"
-              } 
+                BlockingPeptidePreparationDate: date,
+                PeptideSupplier: r?.Supplier || ""
+              }
               this.setState({
                 peptidePrepData: peptidePrepData,
                 peptidePrepRows: [...this.state.peptidePrepRows, peptidePrepData]
@@ -177,10 +193,9 @@ export default class ManagementControl extends React.Component<IManagementContro
               })
             }
             if (r?.AppType === "Immunohistochemistry") {
-              
               this.setState({
-                IHCLotNumber: r?.LotNumber,
-                IHCLotNumberRows: [...this.state.IHCLotNumberRows, r?.LotNumber]
+                IHCLotNumber: r?.LotNumberOrProductionDate,
+                IHCLotNumberRows: [...this.state.IHCLotNumberRows, r?.LotNumberOrProductionDate]
               })
             }
 
@@ -190,7 +205,7 @@ export default class ManagementControl extends React.Component<IManagementContro
           // this will carry over the type specified in the original query for the results array
           items = await items.getNext();
         }
-        
+
       } catch (err) {
         return null;
       }
@@ -204,71 +219,64 @@ export default class ManagementControl extends React.Component<IManagementContro
   }
 
   formatDate = (date: string) => {
-    let realDate = new Date(date)
-    let dd = String(realDate.getDate());
-    let mm = String(realDate.getMonth() + 1); //January is 0!
-    let yyyy = String(realDate.getFullYear());
-    return dd + "/" + mm + "/" + yyyy;
+    const timestamp = Date.parse(date);
+    if (!isNaN(timestamp)) {
+      return new Date(timestamp);
+    }
+    return null; // Or return a default date, depending on your needs
   }
 
   renderTable() {
     const columns = [
-      { field: 'DateOfPurification', headerName: 'Date Of Purification', width: 200 },
+      { field: 'DateOfPurification', headerName: 'Date Of Purification', width: 200, type: 'date' },
       { field: 'SerumNumber', headerName: 'Serum Number', width: 200 },
       { field: 'ICANumber', headerName: 'ICA Number', width: 200 },
       { field: 'ColumnNumber', headerName: 'Column Number', width: 200 },
-      { field: 'ColumnPreparationDate', headerName: 'Column Preparation Date', width: 200 },
+      { field: 'ColumnPreparationDate', headerName: 'Column Preparation Date', width: 200, type: 'date' },
       { field: 'TotalQuantity', headerName: 'Total Quantity', width: 200 },
-      { field: 'ExtraYieldCV', headerName: 'Extra Yield [C], (V)', width: 200 },
+      { field: 'ExtraYieldCV', headerName: 'Extra Yield (mg)', width: 200 },
       { field: 'LotNumber', headerName: 'Lot Number', width: 200 },
-      { field: 'LabellingDate', headerName: 'Labelling Date', width: 200 },
-      { field: 'BlockingPeptidePreparationDate', headerName: 'Blocking Peptide Preparation Date', width: 250 },
+      { field: 'LabellingDate', headerName: 'Labelling Date', width: 200, type: 'date' },
+      { field: 'BlockingPeptidePreparationDate', headerName: 'Blocking Peptide Preparation Date', width: 250, type: 'date' },
       { field: 'PeptideSupplier', headerName: 'Peptide Supplier', width: 200 },
       { field: 'IFC', headerName: 'Indirect flow cytometry', width: 200 },
       { field: 'IHC', headerName: 'Immunohistochemistry', width: 200 },
     ];
 
-    const maxLength = Math.max(
-      this.state.AntiBPureRows.length, 
-      this.state.ColumnPreparationDateRows.length,
-      this.state.peptidePrepRows.length,
-      this.state.IFCLotNumberRows.length,
-      this.state.IHCLotNumberRows.length,
-      this.state.LabellingDateRows.length
-      // Add other arrays lengths here
-    );
-
-    const rows = Array.from({ length: maxLength }).map((_, index) => ({
-      id: uuidv4(),
-      // Spread operator to merge object properties. Adjust according to actual relationships.
-      DateOfPurification: this.state.AntiBPureRows[index]?.DateOfPurification || "-", 
-      SerumNumber: this.state.AntiBPureRows[index]?.SerumNumber || "-", 
-      ICANumber: this.state.AntiBPureRows[index]?.ICANumber || "-", 
-      ColumnNumber: this.state.AntiBPureRows[index]?.ColumnNumber || "-", 
-      TotalQuantity: this.state.AntiBPureRows[index]?.TotalQuantity || "-",
-      ExtraYieldCV: this.state.AntiBPureRows[index]?.ExtraYieldCV || "-",
-      LotNumber: this.state.AntiBPureRows[index]?.LotNumber || "-",
-      ColumnPreparationDate: this.state.ColumnPreparationDateRows[index] || '-',
-      LabellingDate: this.state.LabellingDateRows[index] || '-',
-      BlockingPeptidePreparationDate: this.state.peptidePrepRows[index]?.BlockingPeptidePreparationDate || '-',
-      PeptideSupplier: this.state.peptidePrepRows[index]?.PeptideSupplier || '-',
-      IFC: this.state.IFCLotNumberRows[index] || '-',
-      IHC: this.state.IHCLotNumberRows[index] || '-',
-      // Add other fields as needed.
-    }));
+    // Combine all rows into a single array
+    const combinedRows = [
+      ...this.state.LotNumberRows.map(lotNumber => ({
+        LotNumber: lotNumber, id: uuidv4()
+      })),
+      ...this.state.AntiBPureRows.map(row => ({ ...row, id: uuidv4() })),
+      ...this.state.ColumnPreparationDateRows.map(date => ({
+        ColumnPreparationDate: date, id: uuidv4()
+      })),
+      ...this.state.LabellingDateRows.map(date => ({
+        LabellingDate: date, id: uuidv4()
+      })),
+      ...this.state.peptidePrepRows.map(row => ({ ...row, id: uuidv4() })),
+      ...this.state.IFCLotNumberRows.map(lotNumber => ({
+        IFC: lotNumber, id: uuidv4()
+      })),
+      ...this.state.IHCLotNumberRows.map(lotNumber => ({
+        IHC: lotNumber, id: uuidv4()
+      })),
+      // Add other arrays similarly
+    ];
 
     return (
       <div style={{ width: '100%' }}>
         <DataGrid
           className={styles.dateGridToolBar}
-          rows={rows}
+          rows={combinedRows}
           columns={columns}
           slots={{
             toolbar: GridToolbar,
             noRowsOverlay: this.state.skeletonLoading ? this.renderSkeletons : undefined
           }}
           sx={{
-            height: rows.length === 0 ? '400px' : 'auto',
+            height: combinedRows.length === 0 ? '400px' : 'auto',
             '& .MuiDataGrid-virtualScroller::-webkit-scrollbar': {
               width: '0.4em',
             },
@@ -289,6 +297,7 @@ export default class ManagementControl extends React.Component<IManagementContro
       </div>
     );
   }
+
 
   renderSkeletons() {
     const skeletonRows = Array.from(new Array(6)); // Number of skeletons
@@ -332,7 +341,7 @@ export default class ManagementControl extends React.Component<IManagementContro
           </div>
         ) : (
           <section style={{ padding: "1em", textAlign: 'left' }}>
-            
+
             <FormControl sx={{ m: 1, minWidth: 120, margin: 0, marginBottom: "1em" }} size="small">
               <InputLabel id="demo-select-small-label">Products</InputLabel>
               <Select
