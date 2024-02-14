@@ -27,8 +27,11 @@ export interface IManagementControlState {
     // LotNumber: string;
   };
   AntiBPureRows: any[];
-  ColumnPreparationDate: Date | null;
-  ColumnPreparationDateRows: any[];
+  ColPrepData: {
+    ColumnPreparationDate: Date | null,
+    ColumnNumber: string,
+  } | null;
+  ColPrepDataRows: any[]
   LabellingDate: Date | null;
   LabellingDateRows: any[];
   peptidePrepData: {
@@ -67,8 +70,11 @@ export default class ManagementControl extends React.Component<IManagementContro
         // LotNumber: "",
       },
       AntiBPureRows: [],
-      ColumnPreparationDate: null,
-      ColumnPreparationDateRows: [],
+      ColPrepData: {
+        ColumnPreparationDate: null,
+        ColumnNumber: ""
+      },
+      ColPrepDataRows: [],
       LabellingDate: null,
       LabellingDateRows: [],
       peptidePrepData: {
@@ -105,7 +111,7 @@ export default class ManagementControl extends React.Component<IManagementContro
     this.setState({
       productId: value,
       AntiBPureRows: [],
-      ColumnPreparationDateRows: [],
+      ColPrepDataRows: [],
       LabellingDateRows: [],
       peptidePrepRows: [],
       IFCLotNumberRows: [],
@@ -161,11 +167,15 @@ export default class ManagementControl extends React.Component<IManagementContro
             }
 
             if (r?.DevType === "ColumnPreparation" || r?.DevType === "ColumnPreparationForFusionPeptide") {
-              const ColPrepDate = this.formatDate(r?.DateOfColumnPreparation)
-              this.setState({
+              const ColPrepDate = this.formatDate(r?.DateOfColumnPreparation);
+              const ColPrepData = {
                 ColumnPreparationDate: ColPrepDate,
-                ColumnPreparationDateRows: [...this.state.ColumnPreparationDateRows, ColPrepDate]
-              })
+                ColumnNumber: r?.ColumnNumber || "",
+              };
+              this.setState({
+                ColPrepData: ColPrepData,
+                ColPrepDataRows: [...this.state.ColPrepDataRows, ColPrepData]
+              });
             }
             if (r?.DevType === "AntibodyLabelling") {
               const LabellingDate = this.formatDate(r?.LabellingDate)
@@ -249,9 +259,7 @@ export default class ManagementControl extends React.Component<IManagementContro
         LotNumber: lotNumber, id: uuidv4()
       })),
       ...this.state.AntiBPureRows.map(row => ({ ...row, id: uuidv4() })),
-      ...this.state.ColumnPreparationDateRows.map(date => ({
-        ColumnPreparationDate: date, id: uuidv4()
-      })),
+      ...this.state.ColPrepDataRows.map(row => ({ ...row, id: uuidv4() })),
       ...this.state.LabellingDateRows.map(date => ({
         LabellingDate: date, id: uuidv4()
       })),
