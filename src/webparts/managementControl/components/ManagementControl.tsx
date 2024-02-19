@@ -24,7 +24,7 @@ export interface IManagementControlState {
     ColumnNumber: string;
     TotalQuantity: string;
     ExtraYieldCV: string;
-    // LotNumber: string;
+    LotNumber: string;
   };
   AntiBPureRows: any[];
   ColPrepData: {
@@ -32,11 +32,15 @@ export interface IManagementControlState {
     ColumnNumber: string,
   } | null;
   ColPrepDataRows: any[]
-  LabellingDate: Date | null;
-  LabellingDateRows: any[];
+  Labelling: {
+    LabellingDate: Date | null,
+    LotNumber: string;
+  };
+  LabellingRows: any[];
   peptidePrepData: {
     BlockingPeptidePreparationDate: Date | null,
     PeptideSupplier: string,
+    LotNumber: string;
   };
   peptidePrepRows: any[];
 
@@ -54,7 +58,7 @@ export default class ManagementControl extends React.Component<IManagementContro
 
   constructor(props: IManagementControlProps) {
     super(props);
-    
+
     this.state = {
       products: [],
       productId: "",
@@ -67,7 +71,7 @@ export default class ManagementControl extends React.Component<IManagementContro
         ColumnNumber: "",
         TotalQuantity: "",
         ExtraYieldCV: "",
-        // LotNumber: "",
+        LotNumber: "",
       },
       AntiBPureRows: [],
       ColPrepData: {
@@ -75,11 +79,15 @@ export default class ManagementControl extends React.Component<IManagementContro
         ColumnNumber: ""
       },
       ColPrepDataRows: [],
-      LabellingDate: null,
-      LabellingDateRows: [],
+      Labelling: {
+        LabellingDate: null,
+        LotNumber: "",
+      },
+      LabellingRows: [],
       peptidePrepData: {
         BlockingPeptidePreparationDate: null,
         PeptideSupplier: "",
+        LotNumber: "",
       },
       peptidePrepRows: [],
 
@@ -112,7 +120,7 @@ export default class ManagementControl extends React.Component<IManagementContro
       productId: value,
       AntiBPureRows: [],
       ColPrepDataRows: [],
-      LabellingDateRows: [],
+      LabellingRows: [],
       peptidePrepRows: [],
       IFCLotNumberRows: [],
       IHCLotNumberRows: [],
@@ -138,18 +146,18 @@ export default class ManagementControl extends React.Component<IManagementContro
         // the results property will be an array of the items returned
         if (items.results?.length > 0) {
           items.results.forEach((r: any) => {
-            if (
-              r?.DevType === "AntibodyLabelling" ||
-              r?.DevType === "BlockingPeptidePreparation" ||
-              r?.DevType === "FusionBlockingPeptidePreparation" ||
-              r?.AppType === "Immunohistochemistry") {
-                this.setState({
-                  LotNumber: r?.LotNumber,
-                  LotNumberRows: [...this.state.LotNumberRows, r?.LotNumber]
-                })
-            }
+            // if (
+            //   r?.DevType === "AntibodyLabelling" ||
+            //   r?.DevType === "BlockingPeptidePreparation" ||
+            //   r?.DevType === "FusionBlockingPeptidePreparation" ||
+            //   r?.AppType === "Immunohistochemistry") {
+            //   this.setState({
+            //     LotNumber: r?.LotNumber,
+            //     LotNumberRows: [...this.state.LotNumberRows, r?.LotNumber]
+            //   })
+            // }
 
-            if (r?.DevType === "AntibodyPurification") {
+            if (r?.DevType === "Antibody Purification") {
               const date = this.formatDate(r?.DateOfPurification)
               const AntibodyPurificationData = {
                 DateOfPurification: date,
@@ -158,7 +166,7 @@ export default class ManagementControl extends React.Component<IManagementContro
                 ColumnNumber: r?.ColumnNumber || "",
                 TotalQuantity: r?.Total_x0028_mg_x0029_CA || "",
                 ExtraYieldCV: r?.ExtraYieldForStorageMG || "",
-                // LotNumber: r?.LotNumber || ""
+                LotNumber: r?.LotNumber || ""
               }
               this.setState({
                 AntibodyPurificationData: AntibodyPurificationData,
@@ -166,7 +174,7 @@ export default class ManagementControl extends React.Component<IManagementContro
               })
             }
 
-            if (r?.DevType === "ColumnPreparation" || r?.DevType === "ColumnPreparationForFusionPeptide") {
+            if (r?.DevType === "Column Preparation" || r?.DevType === "Column Preparation For Fusion Peptide") {
               const ColPrepDate = this.formatDate(r?.DateOfColumnPreparation);
               const ColPrepData = {
                 ColumnPreparationDate: ColPrepDate,
@@ -177,18 +185,22 @@ export default class ManagementControl extends React.Component<IManagementContro
                 ColPrepDataRows: [...this.state.ColPrepDataRows, ColPrepData]
               });
             }
-            if (r?.DevType === "AntibodyLabelling") {
-              const LabellingDate = this.formatDate(r?.LabellingDate)
+            if (r?.DevType === "Antibody Labelling") {
+              const Labelling = {
+                LabellingDate: this.formatDate(r?.LabellingDate),
+                LotNumber: r?.LotNumber || ""
+              }
               this.setState({
-                LabellingDate: LabellingDate, 
-                LabellingDateRows: [...this.state.LabellingDateRows, LabellingDate] 
+                Labelling: Labelling,
+                LabellingRows: [...this.state.LabellingRows, Labelling]
               })
             }
-            if (r?.DevType === "BlockingPeptidePreparation" || r?.DevType === "FusionBlockingPeptidePreparation") {
+            if (r?.DevType === "Blocking Peptide Preparation" || r?.DevType === "Fusion Blocking Peptide Preparation") {
               const date = this.formatDate(r?.BlockingPeptidePreparationDate || r?.Date)
               const peptidePrepData = {
                 BlockingPeptidePreparationDate: date,
-                PeptideSupplier: r?.Supplier || ""
+                PeptideSupplier: r?.Supplier || "",
+                LotNumber: r?.LotNumber || ""
               }
               this.setState({
                 peptidePrepData: peptidePrepData,
@@ -196,7 +208,7 @@ export default class ManagementControl extends React.Component<IManagementContro
               })
             }
 
-            if (r?.AppType === "IndirectFlowCytometry") {
+            if (r?.AppType === "Indirect Flow Cytometry") {
               this.setState({
                 IFCLotNumber: r?.LotNumber,
                 IFCLotNumberRows: [...this.state.IFCLotNumberRows, r?.LotNumber]
@@ -242,10 +254,10 @@ export default class ManagementControl extends React.Component<IManagementContro
       { field: 'SerumNumber', headerName: 'Serum Number', width: 200 },
       { field: 'ICANumber', headerName: 'ICA Number', width: 200 },
       { field: 'ColumnNumber', headerName: 'Column Number', width: 200 },
-      { field: 'ColumnPreparationDate', headerName: 'Column Preparation Date', width: 200, type: 'date' },
       { field: 'TotalQuantity', headerName: 'Total Quantity', width: 200 },
       { field: 'ExtraYieldCV', headerName: 'Extra Yield (mg)', width: 200 },
       { field: 'LotNumber', headerName: 'Lot Number', width: 200 },
+      { field: 'ColumnPreparationDate', headerName: 'Column Preparation Date', width: 200, type: 'date' },
       { field: 'LabellingDate', headerName: 'Labelling Date', width: 200, type: 'date' },
       { field: 'BlockingPeptidePreparationDate', headerName: 'Blocking Peptide Preparation Date', width: 250, type: 'date' },
       { field: 'PeptideSupplier', headerName: 'Peptide Supplier', width: 200 },
@@ -255,20 +267,19 @@ export default class ManagementControl extends React.Component<IManagementContro
 
     // Combine all rows into a single array
     const combinedRows = [
-      ...this.state.LotNumberRows.map(lotNumber => ({
-        LotNumber: lotNumber, id: uuidv4()
-      })),
+      // ...this.state.LotNumberRows.map(lotNumber => ({
+      //   LotNumber: lotNumber, id: uuidv4()
+      // })),
       ...this.state.AntiBPureRows.map(row => ({ ...row, id: uuidv4() })),
       ...this.state.ColPrepDataRows.map(row => ({ ...row, id: uuidv4() })),
-      ...this.state.LabellingDateRows.map(date => ({
-        LabellingDate: date, id: uuidv4()
-      })),
+      ...this.state.LabellingRows.map(row => ({ ...row, id: uuidv4() })),
       ...this.state.peptidePrepRows.map(row => ({ ...row, id: uuidv4() })),
       ...this.state.IFCLotNumberRows.map(lotNumber => ({
         IFC: lotNumber, id: uuidv4()
       })),
       ...this.state.IHCLotNumberRows.map(lotNumber => ({
-        IHC: lotNumber, id: uuidv4()
+        IHC: lotNumber, id: uuidv4(),
+        LotNumber: lotNumber
       })),
       // Add other arrays similarly
     ];
