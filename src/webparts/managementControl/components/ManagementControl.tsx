@@ -279,7 +279,6 @@ export default class ManagementControl extends React.Component<IManagementContro
       })),
       ...this.state.IHCLotNumberRows.map(lotNumber => ({
         IHC: lotNumber, id: uuidv4(),
-        LotNumber: lotNumber
       })),
       // Add other arrays similarly
     ];
