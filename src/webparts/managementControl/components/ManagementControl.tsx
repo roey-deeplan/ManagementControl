@@ -135,6 +135,7 @@ export default class ManagementControl extends React.Component<IManagementContro
   async fetchProductDataFromLists() {
 
     const lists = await this.sp.web.lists()
+    console.log("fetchProductDataFromLists - lists:", lists)
 
     const getItemsReq = lists.map(async (l: any) => {
       try {
@@ -156,6 +157,7 @@ export default class ManagementControl extends React.Component<IManagementContro
             //     LotNumberRows: [...this.state.LotNumberRows, r?.LotNumber]
             //   })
             // }
+            console.log("roey", r);
 
             if (r?.DevType === "Antibody Purification") {
               const date = this.formatDate(r?.DateOfPurification)
@@ -284,7 +286,7 @@ export default class ManagementControl extends React.Component<IManagementContro
     ];
 
     return (
-      <div style={{ width: '100%' }}>
+      <div style={{ width: '100%', direction: 'ltr' }}>
         <DataGrid
           className={styles.dateGridToolBar}
           rows={combinedRows}
