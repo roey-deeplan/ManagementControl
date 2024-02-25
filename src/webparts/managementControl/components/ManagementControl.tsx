@@ -11,14 +11,15 @@ import "./style.css"
 import "./ManagementControl.module.scss";
 import type { IManagementControlProps } from './IManagementControlProps';
 import Skeleton from '@mui/material/Skeleton';
-
+import Autocomplete from '@mui/material/Autocomplete';
+import TextField from '@mui/material/TextField'
 export interface IManagementControlState {
   products: any[];
   productId: string;
   LotNumber: string;
   LotNumberRows: any[];
   AntibodyPurificationData: {
-    DateOfPurification: Date | null,
+    DateOfPurification: Date | null;
     SerumNumber: string;
     ICANumber: string;
     ColumnNumber: string;
@@ -28,8 +29,9 @@ export interface IManagementControlState {
   };
   AntiBPureRows: any[];
   ColPrepData: {
-    ColumnPreparationDate: Date | null,
-    ColumnNumber: string,
+    ColumnPreparationDate: Date | null;
+    ColumnNumber: string;
+    PeptideSupplier: string;
   } | null;
   ColPrepDataRows: any[]
   Labelling: {
@@ -76,7 +78,8 @@ export default class ManagementControl extends React.Component<IManagementContro
       AntiBPureRows: [],
       ColPrepData: {
         ColumnPreparationDate: null,
-        ColumnNumber: ""
+        ColumnNumber: "",
+        PeptideSupplier: ""
       },
       ColPrepDataRows: [],
       Labelling: {
@@ -112,12 +115,14 @@ export default class ManagementControl extends React.Component<IManagementContro
   }
 
   // Generic onChange
-  onChange = (e: SelectChangeEvent) => {
-    const { name, value } = e.target;
+  onChange = (event: any, newValue: any) => {
+    // Assuming newValue is the whole product object selected from the Autocomplete
+    // You directly get the product ID from the newValue
+    const productId = newValue ? newValue.Id : '';
 
     // Reset the relevant state arrays and other related state variables before fetching new data.
     this.setState({
-      productId: value,
+      productId: productId,
       AntiBPureRows: [],
       ColPrepDataRows: [],
       LabellingRows: [],
@@ -132,10 +137,10 @@ export default class ManagementControl extends React.Component<IManagementContro
     });
   };
 
+
   async fetchProductDataFromLists() {
 
     const lists = await this.sp.web.lists()
-    console.log("fetchProductDataFromLists - lists:", lists)
 
     const getItemsReq = lists.map(async (l: any) => {
       try {
@@ -147,17 +152,6 @@ export default class ManagementControl extends React.Component<IManagementContro
         // the results property will be an array of the items returned
         if (items.results?.length > 0) {
           items.results.forEach((r: any) => {
-            // if (
-            //   r?.DevType === "AntibodyLabelling" ||
-            //   r?.DevType === "BlockingPeptidePreparation" ||
-            //   r?.DevType === "FusionBlockingPeptidePreparation" ||
-            //   r?.AppType === "Immunohistochemistry") {
-            //   this.setState({
-            //     LotNumber: r?.LotNumber,
-            //     LotNumberRows: [...this.state.LotNumberRows, r?.LotNumber]
-            //   })
-            // }
-            console.log("roey", r);
 
             if (r?.DevType === "Antibody Purification") {
               const date = this.formatDate(r?.DateOfPurification)
@@ -177,10 +171,13 @@ export default class ManagementControl extends React.Component<IManagementContro
             }
 
             if (r?.DevType === "Column Preparation" || r?.DevType === "Column Preparation For Fusion Peptide") {
+              console.log("roey", r);
+
               const ColPrepDate = this.formatDate(r?.DateOfColumnPreparation);
               const ColPrepData = {
                 ColumnPreparationDate: ColPrepDate,
                 ColumnNumber: r?.ColumnNumber || "",
+                PeptideSupplier: r?.Supplier || ""
               };
               this.setState({
                 ColPrepData: ColPrepData,
@@ -269,9 +266,6 @@ export default class ManagementControl extends React.Component<IManagementContro
 
     // Combine all rows into a single array
     const combinedRows = [
-      // ...this.state.LotNumberRows.map(lotNumber => ({
-      //   LotNumber: lotNumber, id: uuidv4()
-      // })),
       ...this.state.AntiBPureRows.map(row => ({ ...row, id: uuidv4() })),
       ...this.state.ColPrepDataRows.map(row => ({ ...row, id: uuidv4() })),
       ...this.state.LabellingRows.map(row => ({ ...row, id: uuidv4() })),
@@ -361,25 +355,16 @@ export default class ManagementControl extends React.Component<IManagementContro
           </div>
         ) : (
           <section style={{ padding: "1em", textAlign: 'left' }}>
-
-            <FormControl sx={{ m: 1, minWidth: 120, margin: 0, marginBottom: "1em" }} size="small">
-              <InputLabel id="demo-select-small-label">Products</InputLabel>
-              <Select
-                labelId="demo-select-small-label"
-                id="demo-select-small"
-                value={this.state.productId}
-                label="Product"
-                name={"productId"}
-                onChange={this.onChange}
-              >
-                <MenuItem value="">
-                  <em>None</em>
-                </MenuItem>
-                {this.state.products.map((item) => (
-                  <MenuItem key={uuidv4()} value={item.Id}>{item.ProductSerialNumber}</MenuItem>
-                ))}
-              </Select>
-            </FormControl>
+            <Autocomplete
+              sx={{ m: 1, width: '15%', margin: 0, marginBottom: "1em", }}
+              size="small"
+              id="products-autocomplete"
+              options={this.state.products}
+              getOptionLabel={(option) => option.ProductSerialNumber || ""}
+              value={this.state.products.find(product => product.Id === this.state.productId) || null}
+              onChange={this.onChange} // Set the method to handle changes
+              renderInput={(params) => <TextField {...params} label="Products" variant="outlined" size="small" />}
+            />
             <div className={styles.container}>
               {this.renderTable()}
             </div>
