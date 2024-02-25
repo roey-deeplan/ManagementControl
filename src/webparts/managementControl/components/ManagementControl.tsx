@@ -171,7 +171,6 @@ export default class ManagementControl extends React.Component<IManagementContro
             }
 
             if (r?.DevType === "Column Preparation" || r?.DevType === "Column Preparation For Fusion Peptide") {
-              console.log("roey", r);
 
               const ColPrepDate = this.formatDate(r?.DateOfColumnPreparation);
               const ColPrepData = {
