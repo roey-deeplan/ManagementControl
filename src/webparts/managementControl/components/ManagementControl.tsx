@@ -253,7 +253,7 @@ export default class ManagementControl extends React.Component<IManagementContro
       { field: 'DateOfPurification', headerName: 'Date Of Purification', width: 200, type: 'date', valueFormatter: (params: any) => params.value ? dayjs(params.value).format('DD/MM/YYYY') : "", },
       { field: 'SerumNumber', headerName: 'Serum Number', width: 200 },
       { field: 'ICANumber', headerName: 'ICA Number', width: 200 },
-      { field: 'ColumnNumber', headerName: 'Column Number', width: 200 },
+      { field: 'ColumnNumber', headerName: 'Column Number', width: 300 },
       { field: 'TotalQuantity', headerName: 'Total Quantity', width: 200 },
       { field: 'ExtraYieldCV', headerName: 'Extra Yield (mg)', width: 200 },
       { field: 'LotNumber', headerName: 'Lot Number', width: 200 },
