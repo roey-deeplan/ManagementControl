@@ -13,6 +13,8 @@ import type { IManagementControlProps } from './IManagementControlProps';
 import Skeleton from '@mui/material/Skeleton';
 import Autocomplete from '@mui/material/Autocomplete';
 import TextField from '@mui/material/TextField'
+import * as moment from 'moment';
+import * as dayjs from 'dayjs';
 export interface IManagementControlState {
   products: any[];
   productId: string;
@@ -248,16 +250,16 @@ export default class ManagementControl extends React.Component<IManagementContro
 
   renderTable() {
     const columns = [
-      { field: 'DateOfPurification', headerName: 'Date Of Purification', width: 200, type: 'date' },
+      { field: 'DateOfPurification', headerName: 'Date Of Purification', width: 200, type: 'date', valueFormatter: (params: any) => params.value ? dayjs(params.value).format('DD/MM/YYYY') : "", },
       { field: 'SerumNumber', headerName: 'Serum Number', width: 200 },
       { field: 'ICANumber', headerName: 'ICA Number', width: 200 },
       { field: 'ColumnNumber', headerName: 'Column Number', width: 200 },
       { field: 'TotalQuantity', headerName: 'Total Quantity', width: 200 },
       { field: 'ExtraYieldCV', headerName: 'Extra Yield (mg)', width: 200 },
       { field: 'LotNumber', headerName: 'Lot Number', width: 200 },
-      { field: 'ColumnPreparationDate', headerName: 'Column Preparation Date', width: 200, type: 'date' },
-      { field: 'LabellingDate', headerName: 'Labelling Date', width: 200, type: 'date' },
-      { field: 'BlockingPeptidePreparationDate', headerName: 'Blocking Peptide Preparation Date', width: 250, type: 'date' },
+      { field: 'ColumnPreparationDate', headerName: 'Column Preparation Date', width: 200, type: 'date', valueFormatter: (params: any) => params.value ? dayjs(params.value).format('DD/MM/YYYY') : "", },
+      { field: 'LabellingDate', headerName: 'Labelling Date', width: 200, type: 'date', valueFormatter: (params: any) => params.value ? dayjs(params.value).format('DD/MM/YYYY') : "", },
+      { field: 'BlockingPeptidePreparationDate', headerName: 'Blocking Peptide Preparation Date', width: 250, type: 'date', valueFormatter: (params: any) => params.value ? dayjs(params.value).format('DD/MM/YYYY') : "", },
       { field: 'PeptideSupplier', headerName: 'Peptide Supplier', width: 200 },
       { field: 'IFC', headerName: 'Indirect flow cytometry', width: 200 },
       { field: 'IHC', headerName: 'Immunohistochemistry', width: 200 },

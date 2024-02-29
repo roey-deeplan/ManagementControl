@@ -3,7 +3,7 @@
   "solution": {
     "name": "management-control-client-side-solution",
     "id": "d4c3e183-b1d0-4de1-a75b-c1ef753e67e0",
-    "version": "1.0.2.1",
+    "version": "1.0.2.2",
     "includeClientSideAssets": true,
     "skipFeatureDeployment": true,
     "isDomainIsolated": false,
