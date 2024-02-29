@@ -3,24 +3,60 @@
   "id": "78b9fe50-352c-4e20-9c92-d548cdc0d62c",
   "alias": "ManagementControlWebPart",
   "componentType": "WebPart",
-
   "version": "*",
   "manifestVersion": 2,
-
   "requiresCustomScript": false,
-  "supportedHosts": ["SharePointWebPart", "TeamsPersonalApp", "TeamsTab", "SharePointFullPage"],
+  "supportedHosts": [
+    "SharePointWebPart",
+    "TeamsPersonalApp",
+    "TeamsTab",
+    "SharePointFullPage"
+  ],
   "supportsThemeVariants": true,
   "supportsFullBleed": true,
-
-  "preconfiguredEntries": [{
-    "groupId": "5c03119e-3074-46fd-976b-c60198311f70",
-    "group": { "default": "Advanced" },
-    "title": { "default": "ManagementControl" },
-    "description": { "default": "ManagementControl description" },
-    "officeFabricIconFontName": "TaskManager",
-    "properties": {
-      "Title": "Management Control",
-      "ProductsListId": "cc70ca4f-ee0a-4ea8-a921-f13428228919"
+  "preconfiguredEntries": [
+    {
+      "groupId": "5c03119e-3074-46fd-976b-c60198311f70",
+      "group": {
+        "default": "Advanced"
+      },
+      "title": {
+        "default": "ManagementControl"
+      },
+      "description": {
+        "default": "ManagementControl description"
+      },
+      "officeFabricIconFontName": "TaskManager",
+      "properties": {
+        "Title": "Management Control",
+        "ProductsListId": "cc70ca4f-ee0a-4ea8-a921-f13428228919",
+        "width1": 200,
+        "Cell1": "Date Of Purification",
+        "width2": 200,
+        "Cell2": "Serum Number",
+        "width3": 200,
+        "Cell3": "ICA Number",
+        "width4": 200,
+        "Cell4": "Column Number",
+        "width5": 200,
+        "Cell5": "Total Quantity",
+        "width6": 200,
+        "Cell6": "Extra Yield (mg)",
+        "width7": 200,
+        "Cell7": "Lot Number",
+        "width8": 200,
+        "Cell8": "Column Preparation Date",
+        "width9": 200,
+        "Cell9": "Labelling Date",
+        "width10": 200,
+        "Cell10": "Blocking Peptide Preparation Date",
+        "width11": 200,
+        "Cell11": "Peptide Supplier",
+        "width12": 200,
+        "Cell12": "Indirect flow cytometry",
+        "width13": 200,
+        "Cell14": "Immunohistochemistry"
+      }
     }
-  }]
+  ]
 }

@@ -250,19 +250,19 @@ export default class ManagementControl extends React.Component<IManagementContro
 
   renderTable() {
     const columns = [
-      { field: 'DateOfPurification', headerName: 'Date Of Purification', width: 200, type: 'date', valueFormatter: (params: any) => params.value ? dayjs(params.value).format('DD/MM/YYYY') : "", },
-      { field: 'SerumNumber', headerName: 'Serum Number', width: 200 },
-      { field: 'ICANumber', headerName: 'ICA Number', width: 200 },
-      { field: 'ColumnNumber', headerName: 'Column Number', width: 300 },
-      { field: 'TotalQuantity', headerName: 'Total Quantity', width: 200 },
-      { field: 'ExtraYieldCV', headerName: 'Extra Yield (mg)', width: 200 },
-      { field: 'LotNumber', headerName: 'Lot Number', width: 200 },
-      { field: 'ColumnPreparationDate', headerName: 'Column Preparation Date', width: 200, type: 'date', valueFormatter: (params: any) => params.value ? dayjs(params.value).format('DD/MM/YYYY') : "", },
-      { field: 'LabellingDate', headerName: 'Labelling Date', width: 200, type: 'date', valueFormatter: (params: any) => params.value ? dayjs(params.value).format('DD/MM/YYYY') : "", },
-      { field: 'BlockingPeptidePreparationDate', headerName: 'Blocking Peptide Preparation Date', width: 250, type: 'date', valueFormatter: (params: any) => params.value ? dayjs(params.value).format('DD/MM/YYYY') : "", },
-      { field: 'PeptideSupplier', headerName: 'Peptide Supplier', width: 200 },
-      { field: 'IFC', headerName: 'Indirect flow cytometry', width: 200 },
-      { field: 'IHC', headerName: 'Immunohistochemistry', width: 200 },
+      { field: 'DateOfPurification', headerName: this.props.Cell1, width: this.props.width1, type: 'date', valueFormatter: (params: any) => params.value ? dayjs(params.value).format('DD/MM/YYYY') : "", },
+      { field: 'SerumNumber', headerName: this.props.Cell2, width: this.props.width2 },
+      { field: 'ICANumber', headerName: this.props.Cell3, width: this.props.width3 },
+      { field: 'ColumnNumber', headerName: this.props.Cell4, width: this.props.width4 },
+      { field: 'TotalQuantity', headerName: this.props.Cell5, width: this.props.width5 },
+      { field: 'ExtraYieldCV', headerName: this.props.Cell6, width: this.props.width6 },
+      { field: 'LotNumber', headerName: this.props.Cell7, width: this.props.width7 },
+      { field: 'ColumnPreparationDate', headerName: this.props.Cell8, width: this.props.width8, type: 'date', valueFormatter: (params: any) => params.value ? dayjs(params.value).format('DD/MM/YYYY') : "", },
+      { field: 'LabellingDate', headerName: this.props.Cell9, width: this.props.width9, type: 'date', valueFormatter: (params: any) => params.value ? dayjs(params.value).format('DD/MM/YYYY') : "", },
+      { field: 'BlockingPeptidePreparationDate', headerName: this.props.Cell10, width: this.props.width10, type: 'date', valueFormatter: (params: any) => params.value ? dayjs(params.value).format('DD/MM/YYYY') : "", },
+      { field: 'PeptideSupplier', headerName: this.props.Cell11, width: this.props.width11 },
+      { field: 'IFC', headerName: this.props.Cell12, width: this.props.width12 },
+      { field: 'IHC', headerName: this.props.Cell13, width: this.props.width13 },
     ];
 
     // Combine all rows into a single array
