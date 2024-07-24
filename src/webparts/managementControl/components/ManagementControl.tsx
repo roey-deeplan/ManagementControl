@@ -112,7 +112,8 @@ export default class ManagementControl extends React.Component<IManagementContro
 
   async onInit() {
     this.setState({ isLoading: true })
-    const products = await this.sp.web.lists.getById(this.props.ProductsListId).items();
+    const products = await this.sp.web.lists.getById(this.props.ProductsListId).items.getAll();
+    console.log("products:", products)
     this.setState({ products: products, isLoading: false });
   }
 
